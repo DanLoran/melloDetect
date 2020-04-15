@@ -15,7 +15,6 @@ import torch
 import argparse
 import torchvision.models as models
 import torch.utils.model_zoo as model_zoo
-from torchvision.transforms import Compose, Normalize, Resize, ToTensor
 from torch.optim import SGD
 from torch.nn import BCELoss
 from sklearn.metrics import roc_auc_score
@@ -60,10 +59,7 @@ cur = -1
 n_eps = 10 - cur - 1
 optimizer = SGD(model.parameters(), lr=0.001)
 criterion = BCELoss()
-normalize = Normalize([0.485, 0.456, 0.406],
-                      [0.229, 0.224, 0.225])
-dataset = MelloDataSet(options.train_addr,
-                           transform=Compose([Resize(224), ToTensor(), normalize]))
+dataset = MelloDataSet(options.train_addr)
 loader = torch.utils.data.DataLoader(dataset, batch_size=32)
 batch_n = 0
 
@@ -88,8 +84,7 @@ for ep in range(n_eps):
 
 # Begin Validating
 if (options.run_validation):
-    test_dataset = MelloDataSet(options.val_addr,
-                                transform=Compose([Resize(224), ToTensor(), normalize]))
+    test_dataset = MelloDataSet(options.val_addr)
     loader = torch.utils.data.DataLoader(test_dataset, batch_size=8)
 
     # Initialize two empty vectors that we can use in the future for storing aggregated ground truth (gt)
