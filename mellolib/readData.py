@@ -10,7 +10,7 @@ class MelloDataSet(Dataset):
         labels = []
 
         if (subset is not None):
-            subset_idx = LABELS.index(subset)
+            subset_idx = FIELDS.index(subset)
 
         with open(data_dir+"label.txt", "r") as f:
             for line in f:
