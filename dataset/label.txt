@@ -1,0 +1,5 @@
+image number,age,sex,malignant/benign.
+sex: 0 = female, 1 = male
+mal/ben: 0 = benign, 1 = malignant
+
+null = -1
