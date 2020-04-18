@@ -1,17 +1,19 @@
 #/bin/bash
 
-trainAddr="fakeData/trainData/"
-testAddr="fakeData/valData/"
-weightAddr="./weight/"
+trainAddr="/home/minh/git/melloDetect/fakeData/trainData/"
+testAddr="/home/minh/git/melloDetect/fakeData/valData/"
+weightAddr="/home/minh/git/melloDetect/weight/"
+logAddr="/home/minh/git/melloDetect/logs/basic_runner.txt"
 architecture="zoo-resnet18"
 
 python3 basic_runner.py \
---deploy-on-gpu=false \
---run-validation=true \
---checkpoint=false \
---run-at-checkpoint=false \
+--debug=True \
+--deploy-on-gpu=False \
+--run-validation=True \
+--checkpoint=False \
+--run-at-checkpoint=False \
 --train-addr=${trainAddr} \
---test-addr=${testAddr} \
+--val-addr=${testAddr} \
 --weight-addr=${weightAddr} \
 --log-addr=${logAddr} \
 --arch=${architecture}

@@ -1,7 +1,9 @@
 import torch
 import os
+import numpy as np
 from torch.utils.data import Dataset
 from torchvision import transforms
+from PIL import Image
 from mellolib.globalConstants import FIELDS
 
 class MelloDataSet(Dataset):
@@ -33,7 +35,8 @@ class MelloDataSet(Dataset):
     def __getitem__(self, index):
         image_name = self.image_list[index]
         label = self.labels[index]
-        image = torch.load(image_name)
+        image = Image.open(image_name)
+        image = torch.from_numpy(np.asarray(image))
         return image, torch.FloatTensor(label)
 
     def __len__(self):

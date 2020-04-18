@@ -1,19 +1,31 @@
 import argparse
 
+def DEBUGprint(message, opt):
+    if (opt):
+        print(message)
+
+def boolean_string(s):
+    if s not in {'False', 'True'}:
+        raise ValueError('Not a valid boolean string')
+    return s == 'True'
+
 def basic_runner(parser):
-    parser.add_argument("--deploy-on-gpu", action="store_true",
+    parser.add_argument("--deploy-on-gpu", type=boolean_string, default=True,
                         help="Run the trainer/validator on the GPU. Default:\
                         true" )
 
-    parser.add_argument("--run-validation", action="store_true",
+    parser.add_argument("--debug", type=boolean_string, default=True,
+                        help="Print verbosely. Default: true" )
+
+    parser.add_argument("--run-validation", type=boolean_string, default=True,
                         help="Validate result after training. Default:\
                         true" )
 
-    parser.add_argument("--checkpoint", action="store_true",
+    parser.add_argument("--checkpoint", type=boolean_string, default=True,
                         help="Save weights during training. Default:\
                         true")
 
-    parser.add_argument("--run-at-checkpoint", action="store_true",
+    parser.add_argument("--run-at-checkpoint", type=boolean_string, default=True,
                         help="Resume training at checkpoint. Default:\
                         true")
 

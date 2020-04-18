@@ -13,48 +13,43 @@
 
 import torch
 import argparse
-import torchvision.models as models
-import torch.utils.model_zoo as model_zoo
 from torch.optim import SGD
 from torch.nn import BCELoss
 from sklearn.metrics import roc_auc_score
 
-from mellolib import CommonParser
+from mellolib import CommonParser as cmp
 from mellolib.readData import MelloDataSet
 
 # Setup parser
 parser = argparse.ArgumentParser()
-CommonParser.basic_runner(parser)
+cmp.basic_runner(parser)
 options = parser.parse_args()
 
 # # Choose architecture
-# model_urls = {
-#     'resnet18': 'https://download.pytorch.org/models/resnet18-5c106cde.pth',
-#     'resnet34': 'https://download.pytorch.org/models/resnet34-333f7ec4.pth',
-#     'resnet50': 'https://download.pytorch.org/models/resnet50-19c8e357.pth',
-#     'resnet101': 'https://download.pytorch.org/models/resnet101-5d3b4d8f.pth',
-#     'resnet152': 'https://download.pytorch.org/models/resnet152-b121ed2d.pth',
-# }
-# model = models.resnet18
-# if options.arch == "zoo-resnet18":
-#     model = models.resnet18
-#     model.load_state_dict(model_zoo.load_url(model_urls['resnet18']))
-# else:
-#     print("Architecture don't exist!")
-#     exit(1)
+cmp.DEBUGprint("Loading model. \n", options.debug)
+model = torch.hub.load('pytorch/vision:v0.5.0', 'resnet18', pretrained=True)
+
+if options.arch == "zoo-resnet18":
+    if (options.deploy_on_gpu):
+        model = torch.nn.DataParallel(torch.hub.load('pytorch/vision:v0.5.0', 'resnet18', pretrained=True).cuda())
+
+    else:
+        model = torch.hub.load('pytorch/vision:v0.5.0', 'resnet18', pretrained=True)
+else:
+    print("Architecture don't exist!")
+    exit(1)
 
 # If resume training
+cmp.DEBUGprint("Loading previous state. \n", options.debug)
 if options.run_at_checkpoint:
-    model.load_state_dict(options.weight_addr)
+    model.load_state_dict(torch.load(options.weight_addr))
 
 # Setup log
-log = open(options.log_addr,"w")
-
-# Make sure we can run the model on GPU
-model = torch.nn.DataParallel(model)
-model.train()
+cmp.DEBUGprint("Setup log. \n", options.debug)
+log = open(options.log_addr,"w+")
 
 # Basic runner stuff
+cmp.DEBUGprint("Initialize runner. \n", options.debug)
 cur = -1
 n_eps = 10 - cur - 1
 optimizer = SGD(model.parameters(), lr=0.001)
@@ -63,6 +58,8 @@ dataset = MelloDataSet(options.train_addr)
 loader = torch.utils.data.DataLoader(dataset, batch_size=32)
 batch_n = 0
 
+cmp.DEBUGprint("Training... \n", options.debug)
+model.train()
 # Begin Training
 for ep in range(n_eps):
     for inp, target in loader:
@@ -81,8 +78,10 @@ for ep in range(n_eps):
         log.write("\n")
 
     torch.save(model.state_dict(),options.weight_addr + str(ep+cur+1))
+close(options.log_addr)
 
 # Begin Validating
+cmp.DEBUGprint("Validating... \n", options.debug)
 if (options.run_validation):
     test_dataset = MelloDataSet(options.val_addr)
     loader = torch.utils.data.DataLoader(test_dataset, batch_size=8)
