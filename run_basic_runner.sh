@@ -1,7 +1,7 @@
 #/bin/bash
 
-trainAddr="./trainData/"
-testAddr="./valData/"
+trainAddr="fakeData/trainData/"
+testAddr="fakeData/valData/"
 weightAddr="./weight/"
 architecture="zoo-resnet18"
 
