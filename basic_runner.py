@@ -27,7 +27,6 @@ from tqdm import tqdm
 from mellolib import CommonParser as cmp
 from mellolib.readData import MelloDataSet
 from mellolib.globalConstants import ARCH
-from mellolib.models.tiny_fc import tiny_fc
 
 for library in ARCH:
     try:

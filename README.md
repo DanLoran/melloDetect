@@ -10,7 +10,7 @@ To run a visualization plot for learning curve, do:
 ```
 python3 -m visdom.server
 ```
-The previous command will setup a port connection to http://localhost:8097/. Proceed to that link to open up the plotting platform. Afterward, to run an example of basic_runner.py (remember to set the dataset directory correctly in the run_basic_runner.sh), do:
+The previous command will setup a port connection to http://localhost:8097/. Proceed to that link to open up the plotting platform. Afterward, to run an example of basic_runner.py (remember to set the dataset directory correctly in the run_basic_runner.sh), do on a seperate terminal:
 ```
 bash run_basic_runner
 ```
