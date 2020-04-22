@@ -7,12 +7,12 @@ from PIL import Image
 from mellolib.globalConstants import FIELDS
 
 class MelloDataSet(Dataset):
-    def __init__(self, data_dir, subset=None):
+    def __init__(self, data_dir, subset=None, transforms=None):
         image_list = []
         labels = []
 
         if (subset is not None):
-            subset_idx = FIELDS.index(subset)
+            subset_idx = FIELDS[subset]
 
         with open(data_dir+"label.txt", "r") as f:
             for line in f:
@@ -31,13 +31,17 @@ class MelloDataSet(Dataset):
 
         self.image_list = image_list
         self.labels = labels
+        self.transforms = transforms
 
     def __getitem__(self, index):
         image_name = self.image_list[index]
         label = self.labels[index]
         image = Image.open(image_name)
-        image = torch.from_numpy(np.asarray(image))
-        return image, torch.FloatTensor(label)
+
+        if (self.transforms is not None):
+            image = self.transforms(image)
+
+        return image.type(torch.float), torch.FloatTensor(label)
 
     def __len__(self):
         return len(self.image_list)

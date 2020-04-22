@@ -10,6 +10,10 @@ def boolean_string(s):
     return s == 'True'
 
 def basic_runner(parser):
+    parser.add_argument("--show-learning-curve", type=boolean_string, default=True,
+                        help="Show the Learning curve in realtime. Default:\
+                        true" )
+
     parser.add_argument("--deploy-on-gpu", type=boolean_string, default=True,
                         help="Run the trainer/validator on the GPU. Default:\
                         true" )
@@ -45,6 +49,6 @@ def basic_runner(parser):
                         help="Directory where training log will be saved. \
                         Default: ./log/")
 
-    parser.add_argument("--arch", type = str, choices=["zoo-resnet18"],
+    parser.add_argument("--arch", type = str, choices=["zoo-resnet18", "tiny-fc"],
                         help="Neural network architecture. Default:\
                         zoo-resnet18" )

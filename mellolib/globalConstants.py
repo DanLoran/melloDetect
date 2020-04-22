@@ -1,1 +1,2 @@
-FIELDS = {0:"AGE", 1:"GENDER", 2:"MALIGNANT"}
+FIELDS = {"AGE":0, "GENDER":1, "MALIGNANT":2}
+ARCH = ['tiny_fc']

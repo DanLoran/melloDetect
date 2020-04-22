@@ -1,13 +1,14 @@
 #/bin/bash
 
-trainAddr="/home/minh/git/melloDetect/fakeData/trainData/"
-testAddr="/home/minh/git/melloDetect/fakeData/valData/"
+trainAddr="/home/minh/git/melloDetect/dataset/Data/Images/"
+testAddr="/home/minh/git/melloDetect/dataset/Data/Images/"
 weightAddr="/home/minh/git/melloDetect/weight/"
 logAddr="/home/minh/git/melloDetect/logs/basic_runner.txt"
-architecture="zoo-resnet18"
+architecture="tiny-fc"
 
 python3 basic_runner.py \
 --debug=True \
+--show-learning-curve=True \
 --deploy-on-gpu=False \
 --run-validation=True \
 --checkpoint=False \

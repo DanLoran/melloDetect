@@ -5,6 +5,7 @@
 # The runner can be executed on the GPU.
 # The runner will run for 10 epochs with batch size of 32
 # The learning rate is set at 0.01
+# The runner will only consider subset="MALIGNANT" label
 # The validation metric is ROC AUC score
 # Implementation inspired from UCD Chest X-ray Challenge found at:
 # https://github.com/hahnicity/ucd-cxr/blob/master/tutorial/basic.py
@@ -13,28 +14,63 @@
 
 import torch
 import argparse
+from visdom import Visdom
 from torch.optim import SGD
 from torch.nn import BCELoss
 from sklearn.metrics import roc_auc_score
+from torchvision.transforms import Compose
+from torchvision.transforms import Resize
+from torchvision.transforms import ToTensor
+from torchvision.transforms import Scale
+from tqdm import tqdm
 
 from mellolib import CommonParser as cmp
 from mellolib.readData import MelloDataSet
+from mellolib.globalConstants import ARCH
+from mellolib.models.tiny_fc import tiny_fc
+
+for library in ARCH:
+    try:
+        exec("from mellolib.models.{module} import {module}".format(module=library))
+    except Exception as e:
+        print(e)
 
 # Setup parser
 parser = argparse.ArgumentParser()
 cmp.basic_runner(parser)
 options = parser.parse_args()
 
-# # Choose architecture
-cmp.DEBUGprint("Loading model. \n", options.debug)
-model = torch.hub.load('pytorch/vision:v0.5.0', 'resnet18', pretrained=True)
+# Setup visdom
+viz = 0
+if(options.show_learning_curve):
+    try:
+        viz = Visdom()
+    except Exception as e:
+        print(
+            "The visdom experienced an exception while running: {}\n"
+            "The demo displays up-to-date functionality with the GitHub "
+            "version, which may not yet be pushed to pip. Please upgrade "
+            "using `pip install -e .` or `easy_install .`\n"
+            "If this does not resolve the problem, please open an issue on "
+            "our GitHub.".format(repr(e))
+        )
 
+# Choose architecture
+cmp.DEBUGprint("Loading model. \n", options.debug)
+model = 0
+
+# transfer learning from resnet18
 if options.arch == "zoo-resnet18":
     if (options.deploy_on_gpu):
         model = torch.nn.DataParallel(torch.hub.load('pytorch/vision:v0.5.0', 'resnet18', pretrained=True).cuda())
-
     else:
         model = torch.hub.load('pytorch/vision:v0.5.0', 'resnet18', pretrained=True)
+        #TODO: modify the last layer
+
+# example mellolib model
+elif options.arch == "tiny-fc":
+    model = tiny_fc()
+
 else:
     print("Architecture don't exist!")
     exit(1)
@@ -50,26 +86,32 @@ log = open(options.log_addr,"w+")
 
 # Basic runner stuff
 cmp.DEBUGprint("Initialize runner. \n", options.debug)
-cur = -1
-n_eps = 10 - cur - 1
+
+n_eps = 10
 optimizer = SGD(model.parameters(), lr=0.001)
 criterion = BCELoss()
-dataset = MelloDataSet(options.train_addr)
-loader = torch.utils.data.DataLoader(dataset, batch_size=32)
+dataset = MelloDataSet(options.train_addr, subset="MALIGNANT", transforms=Compose([Resize((256,256)), ToTensor()]))
+loader = torch.utils.data.DataLoader(dataset, batch_size=32, shuffle=True)
 batch_n = 0
+itr = 0
+losses = []
+time = []
 
 cmp.DEBUGprint("Training... \n", options.debug)
-model.train()
-# Begin Training
-for ep in range(n_eps):
+
+# Begin Training (ignore tqdm, it is just a progress bar GUI)
+for ep in tqdm(range(n_eps)):
     for inp, target in loader:
 
         if options.deploy_on_gpu:
             target = torch.autograd.Variable(target).cuda()
             inp = torch.autograd.Variable(inp).cuda()
+        else:
+            target = torch.autograd.Variable(target)
+            inp = torch.autograd.Variable(inp)
 
-        out = model(inp)
         optimizer.zero_grad()
+        out = model(inp)
         loss = criterion(out, target)
         loss.backward()
         optimizer.step()
@@ -77,13 +119,18 @@ for ep in range(n_eps):
         log.write(str(loss.cpu().detach().numpy().item()))
         log.write("\n")
 
-    torch.save(model.state_dict(),options.weight_addr + str(ep+cur+1))
-close(options.log_addr)
+        if (options.show_learning_curve):
+            losses.append(loss.cpu().detach().numpy())
+            time.append(itr)
+            viz.line(X=time,Y=losses,win='viz1',name="Learning curve")
+            itr+=1
+    torch.save(model.state_dict(),options.weight_addr + str(ep))
+log.close()
 
 # Begin Validating
-cmp.DEBUGprint("Validating... \n", options.debug)
 if (options.run_validation):
-    test_dataset = MelloDataSet(options.val_addr)
+    cmp.DEBUGprint("Validating... \n", options.debug)
+    test_dataset = MelloDataSet(options.val_addr, subset="MALIGNANT", transforms=Compose([Resize((256,256)), ToTensor()]))
     loader = torch.utils.data.DataLoader(test_dataset, batch_size=8)
 
     # Initialize two empty vectors that we can use in the future for storing aggregated ground truth (gt)
@@ -98,16 +145,20 @@ if (options.run_validation):
     model.eval()
     batch_n = 0
     for inp, target in loader:
+
         if (options.deploy_on_gpu):
             target = torch.autograd.Variable(target).cuda()
             inp = torch.autograd.Variable(inp).cuda()
+        else:
+            target = torch.autograd.Variable(target)
+            inp = torch.autograd.Variable(inp)
+
         out = model(inp)
         # Add results of the model's output to the aggregated prediction vector, and also add aggregated
         # ground truth information as well
         pred = torch.cat((pred, out.data), 0)
         gt = torch.cat((gt, target.data), 0)
-        print("end batch")
 
     # Compute the model area under curve (AUC).
-    auc = compute_AUCs(gt, pred)
-    print("AUC Results: {}".format(sum(auc) / len(auc)))
+    auc = roc_auc_score(gt, pred)
+    print("AUC Results: {}".format(auc))
