@@ -1,5 +1,17 @@
 # melloDetect
-### Running basic_runner
+
+## Set up
+To setup the environment you will need Docker and make. With both installed, you can generate the image with all the requirements using
+```
+make docker
+```
+To create a bash inside the docker container mounting the current directory as working directory you can use the command
+```
+make exec
+```
+Once you are inside the container, you can run the Python scripts as described below.
+
+## Running basic_runner
 The basic runner run SGD optimization method with loss calculation using BCE
 equation. The runner can be executed on GPU. It will run for 10 epochs with
 batch size of 32. The Learning rate is set at 0.01. The runner will only consider subset="MALIGNANT" label. The validation metric is ROC AUC score. For more info, do
