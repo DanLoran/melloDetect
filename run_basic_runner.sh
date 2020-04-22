@@ -1,9 +1,9 @@
 #/bin/bash
 
-trainAddr="/home/minh/git/melloDetect/dataset/Data/Images/"
-testAddr="/home/minh/git/melloDetect/dataset/Data/Images/"
-weightAddr="/home/minh/git/melloDetect/weight/"
-logAddr="/home/minh/git/melloDetect/logs/basic_runner.txt"
+trainAddr="dataset/Data/Images/"
+testAddr="dataset/Data/Images/"
+weightAddr="weight/"
+logAddr="logs/basic_runner.txt"
 architecture="tiny-fc"
 
 python3 basic_runner.py \
