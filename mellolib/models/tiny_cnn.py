@@ -1,6 +1,6 @@
 import torch
 import torch.nn as nn
-import torch.functional as F
+import torch.nn.functional as F
 
 class tiny_cnn(nn.Module):
     def __init__(self):
@@ -12,7 +12,7 @@ class tiny_cnn(nn.Module):
                                padding=0,
                                bias=True)
 
-        self.pool = nn.Maxpool2d(kernel_size=3,
+        self.pool = nn.MaxPool2d(kernel_size=3,
                                  stride=3)
 
         self.conv2 = nn.Conv2d(in_channels=6,
@@ -22,16 +22,16 @@ class tiny_cnn(nn.Module):
                                padding=0,
                                bias=True)
 
-        self.fc1 = nn.Linear(in_features=100,
-                             out_features=1000)
-
-        self.fc2 = nn.Linear(in_features=1000,
+        self.fc1 = nn.Linear(in_features=972,
                              out_features=100)
 
-        self.fc3 = nn.Linear(in_features=100,
+        self.fc2 = nn.Linear(in_features=100,
+                             out_features=50)
+
+        self.fc3 = nn.Linear(in_features=50,
                              out_features=10)
 
-        self.fc2 = nn.Linear(in_features=10,
+        self.fc4 = nn.Linear(in_features=10,
                              out_features=1)
 
     def forward(self, x):
@@ -42,4 +42,4 @@ class tiny_cnn(nn.Module):
         x = F.relu(self.fc2(x))
         x = F.relu(self.fc3(x))
         x = self.fc4(x)
-        return F.log_softmax(x)
+        return F.log_softmax(x,dim=1)
