@@ -1,7 +1,7 @@
 #/bin/bash
 
-trainAddr="dataset/Data/Images/"
-testAddr="dataset/Data/Images/"
+trainAddr="fakeData/trainData"
+testAddr="fakeData/valData"
 weightAddr="weight/"
 logAddr="logs/basic_runner.txt"
 architecture="tiny-fc"

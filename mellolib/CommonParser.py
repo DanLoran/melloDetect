@@ -49,6 +49,8 @@ def basic_runner(parser):
                         help="Directory where training log will be saved. \
                         Default: ./log/")
 
-    parser.add_argument("--arch", type = str, choices=["zoo-resnet18", "tiny-fc"],
+    parser.add_argument("--arch", type = str, choices=["zoo-resnet18",
+                                                       "tiny-fc",
+                                                       "tiny-cnn"],
                         help="Neural network architecture. Default:\
                         zoo-resnet18" )

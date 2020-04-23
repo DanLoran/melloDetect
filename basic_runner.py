@@ -70,6 +70,9 @@ if options.arch == "zoo-resnet18":
 elif options.arch == "tiny-fc":
     model = tiny_fc()
 
+elif options.arch == "tiny-cnn":
+    model = tiny_cnn()
+
 else:
     print("Architecture don't exist!")
     exit(1)
