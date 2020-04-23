@@ -1,10 +1,10 @@
 #/bin/bash
 
-trainAddr="fakeData/trainData"
-testAddr="fakeData/valData"
+trainAddr="dataset/Data/Images/"
+testAddr="dataset/Data/Images/"
 weightAddr="weight/"
 logAddr="logs/basic_runner.txt"
-architecture="tiny-fc"
+architecture="tiny-cnn"
 
 python3 basic_runner.py \
 --debug=True \

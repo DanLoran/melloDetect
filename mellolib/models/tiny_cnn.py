@@ -32,7 +32,9 @@ class tiny_cnn(nn.Module):
                              out_features=10)
 
         self.fc4 = nn.Linear(in_features=10,
-                             out_features=1)
+                             out_features=2)
+
+        self.sm = nn.Softmax(dim=1)
 
     def forward(self, x):
         x = self.pool(F.relu(self.conv1(x)))
@@ -42,4 +44,5 @@ class tiny_cnn(nn.Module):
         x = F.relu(self.fc2(x))
         x = F.relu(self.fc3(x))
         x = self.fc4(x)
-        return F.log_softmax(x,dim=1)
+        x = self.sm(x)
+        return x

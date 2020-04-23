@@ -8,7 +8,8 @@ class tiny_fc(nn.Module):
         self.fc1 = nn.Linear(256*256*3,1000)
         self.fc2 = nn.Linear(1000,100)
         self.fc3 = nn.Linear(100,10)
-        self.fc4 = nn.Linear(10,1)
+        self.fc4 = nn.Linear(10,2)
+        self.sm = nn.Softmax(dim=1)
 
     def forward(self,x):
         x = x.view(x.shape[0], -1)
@@ -16,4 +17,5 @@ class tiny_fc(nn.Module):
         x = F.relu(self.fc2(x))
         x = F.relu(self.fc3(x))
         x = self.fc4(x)
-        return F.log_softmax(x,dim=1)
+        x = self.sm(x)
+        return x
