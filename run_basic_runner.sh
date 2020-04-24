@@ -9,7 +9,7 @@ architecture="tiny-cnn"
 python3 basic_runner.py \
 --debug=True \
 --show-learning-curve=True \
---deploy-on-gpu=False \
+--deploy-on-gpu=True \
 --run-validation=True \
 --checkpoint=False \
 --run-at-checkpoint=False \

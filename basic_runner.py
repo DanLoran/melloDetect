@@ -78,6 +78,14 @@ else:
     print("Architecture don't exist!")
     exit(1)
 
+# If deploy on gpu
+if (options.deploy_on_gpu):
+    if (not torch.cuda.is_available()):
+        print("GPU device doesn't exist")
+    else:
+        model = model.cuda()
+        print("Deploying model on: " + torch.cuda.get_device_name(torch.cuda.current_device()) + "\n")
+
 # If resume training
 cmp.DEBUGprint("Loading previous state. \n", options.debug)
 if options.run_at_checkpoint:
@@ -140,10 +148,6 @@ if (options.run_validation):
     # and model prediction (pred) information.
     gt = torch.FloatTensor()
     pred = torch.FloatTensor()
-    if (options.deploy_on_gpu):
-        gt = torch.FloatTensor().cuda()
-        pred = torch.FloatTensor().cuda()
-
 
     model.eval()
     batch_n = 0
@@ -159,8 +163,8 @@ if (options.run_validation):
         out = model(inp)
         # Add results of the model's output to the aggregated prediction vector, and also add aggregated
         # ground truth information as well
-        pred = torch.cat((pred, out.data), 0)
-        gt = torch.cat((gt, target.data), 0)
+        pred = torch.cat((pred, out.cpu().detach()), 0)
+        gt = torch.cat((gt, target.cpu().detach()), 0)
 
     # Compute the model area under curve (AUC).
     auc = roc_auc_score(gt, pred)
