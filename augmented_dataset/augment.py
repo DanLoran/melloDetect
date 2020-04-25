@@ -1,6 +1,8 @@
 from PIL import Image, ImageOps
 import numpy as np
 from math import log
+import os
+import argparse
 
 def rotator(image, num_images_total):
     rotation_amount = 360 / num_images_total
@@ -57,6 +59,7 @@ def mirror(image):
     yield ImageOps.mirror(image)
 
 def noise(image, num_images_total, noise_magnitude):
+    np.random.seed(123)
     for i in range(num_images_total):
         image_data = np.array(image.convert('RGB')).astype(np.uint16)
         yield Image.fromarray(np.add(np.random.randn(*np.shape(image_data)) * noise_magnitude, image_data).clip(0, 255).astype(np.uint8))
@@ -66,3 +69,12 @@ def augment(image):
     yield from white_balancer(image, 4)
     yield from mirror(image)
     yield from noise(image, 1, 20)
+
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description='Augment an image, fool.')
+    parser.add_argument('source_image', type=str, help='where to read the image')
+    parser.add_argument('dest_path', type=str, help='the directory to write the image to')
+    options = parser.parse_args()
+
+    for idx, image in enumerate(augment(Image.open(options.source_image))):
+        image.save(options.dest_path + os.path.splitext(os.path.basename(options.source_image))[0] + "_" + str(idx) + ".jpg")
