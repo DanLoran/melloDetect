@@ -51,5 +51,4 @@ def basic_runner(parser):
                         Default: ./log/")
 
     parser.add_argument("--arch", type = str, choices=ARCH,
-                        help="Neural network architecture. Default:\
-                        zoo-resnet18" )
+                        help="Neural network architecture")
