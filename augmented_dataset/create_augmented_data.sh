@@ -1,6 +1,6 @@
 #!/bin/bash
 
-FILES=../dataset/Data/images/*
+FILES=../dataset/Data/Images/*
 DEST=Data/
 
 for f in $FILES
