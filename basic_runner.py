@@ -25,7 +25,7 @@ from torchvision.transforms import ToTensor
 from torchvision.transforms import Scale
 from tqdm import tqdm
 
-from mellolib import CommonParser as cmp
+from mellolib import commonParser as cmp
 from mellolib.readData import MelloDataSet
 from mellolib.globalConstants import ARCH
 from mellolib.models import transfer
