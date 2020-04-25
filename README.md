@@ -1,13 +1,11 @@
-# melloDetect
+# MelloDetect
 
 ## Set up
-To setup the environment you will need Docker and make. With both installed, you can generate the image with all the requirements using
+To setup the environment you will need Docker and make. With both installed, you can use the following commands to execute tasks easily
 ```
-make docker
-```
-To create a bash inside the docker container mounting the current directory as working directory you can use the command
-```
-make exec
+make docker     // create docker image
+make run        // run container and starts the visdom server
+make exec       // exec into the container with the current directory mounted as working volume
 ```
 Once you are inside the container, you can run the Python scripts as described below.
 
