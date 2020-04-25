@@ -24,6 +24,7 @@ from torchvision.transforms import Resize
 from torchvision.transforms import ToTensor
 from torchvision.transforms import Scale
 from tqdm import tqdm
+from datetime import datetime
 
 from mellolib import commonParser as cmp
 from mellolib.readData import MelloDataSet
@@ -128,6 +129,14 @@ time = []
 
 cmp.DEBUGprint("Training... \n", options.debug)
 
+
+# current date and time
+now = datetime.now()
+
+time = datetime.timestamp(now)
+timestamp = datetime.fromtimestamp(time)
+print("Start training at ", timestamp)
+
 # Begin Training (ignore tqdm, it is just a progress bar GUI)
 model.train()
 for ep in tqdm(range(n_eps)):
@@ -153,7 +162,7 @@ for ep in tqdm(range(n_eps)):
             time.append(itr)
             viz.line(X=time,Y=losses,win='viz1',name="Learning curve")
             itr+=1
-    torch.save(model.state_dict(),options.weight_addr + str(ep))
+    torch.save(model.state_dict(),options.weight_addr + str(timestamp) + "_epoch_" +  str(ep))
 log.close()
 
 # Begin Validating
