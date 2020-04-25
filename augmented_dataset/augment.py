@@ -76,5 +76,5 @@ if __name__ == "__main__":
     parser.add_argument('dest_path', type=str, help='the directory to write the image to')
     options = parser.parse_args()
 
-    for idx, image in enumerate(augment(Image.open(options.source_image))):
+    for idx, image in enumerate(augment(Image.open(options.source_image).resize((256,256)))):
         image.save(options.dest_path + os.path.splitext(os.path.basename(options.source_image))[0] + "_" + str(idx) + ".jpg")

@@ -19,8 +19,6 @@ if __name__ == "__main__":
         else:
             basename_to_augments_map[basename] = [file]
 
-    print(basename_to_augments_map)
-
     # We assume the filenames are in the first column
     with open(options.source_labels_csv) as source_labels:
         with open(options.dest_labels_csv, 'w') as dest_labels:

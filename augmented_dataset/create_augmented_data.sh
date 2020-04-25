@@ -10,4 +10,4 @@ do
 done
 
 echo "Generating labels..."
-python3 augmented_labels.py ../dataset/label.csv ./label.csv Data/
+python3 augmented_labels.py ../dataset/label.csv Data/label.csv Data/
