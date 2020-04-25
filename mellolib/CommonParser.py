@@ -51,6 +51,7 @@ def basic_runner(parser):
 
     parser.add_argument("--arch", type = str, choices=["zoo-resnet18",
                                                        "tiny-fc",
-                                                       "tiny-cnn"],
+                                                       "tiny-cnn",
+                                                       "resnet18"],
                         help="Neural network architecture. Default:\
                         zoo-resnet18" )

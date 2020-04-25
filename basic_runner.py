@@ -74,6 +74,9 @@ elif options.arch == "tiny-fc":
 elif options.arch == "tiny-cnn":
     model = tiny_cnn()
 
+elif options.arch == "resnet18":
+    model = resnet18()
+
 else:
     print("Architecture don't exist!")
     exit(1)
