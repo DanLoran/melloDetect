@@ -28,10 +28,12 @@ from tqdm import tqdm
 from mellolib import CommonParser as cmp
 from mellolib.readData import MelloDataSet
 from mellolib.globalConstants import ARCH
+from mellolib.models import transfer
 
 for library in ARCH:
     try:
-        exec("from mellolib.models.{module} import {module}".format(module=library))
+        if ('trans' not in library):
+            exec("from mellolib.models.{module} import {module}".format(module=library))
     except Exception as e:
         print(e)
 
@@ -59,23 +61,36 @@ if(options.show_learning_curve):
 cmp.DEBUGprint("Loading model. \n", options.debug)
 model = 0
 
-# transfer learning from resnet18
-if options.arch == "zoo-resnet18":
-    if (options.deploy_on_gpu):
-        model = torch.nn.DataParallel(torch.hub.load('pytorch/vision:v0.5.0', 'resnet18', pretrained=True).cuda())
-    else:
-        model = torch.hub.load('pytorch/vision:v0.5.0', 'resnet18', pretrained=True)
-        #TODO: modify the last layer
-
 # example mellolib model
-elif options.arch == "tiny-fc":
+if options.arch == "tiny_fc":
     model = tiny_fc()
 
-elif options.arch == "tiny-cnn":
+elif options.arch == "tiny_cnn":
     model = tiny_cnn()
 
-elif options.arch == "resnet18":
-    model = resnet18()
+elif options.arch == "trans_resnet18":
+    model = transfer.resnet18()
+
+elif options.arch == "trans_mobilenet":
+    model = transfer.mobilenet()
+
+elif options.arch == "trans_alexnet":
+    model = transfer.alexnet()
+
+elif options.arch == "trans_vgg":
+    model = transfer.vgg()
+
+elif options.arch == "trans_densenet":
+    model = transfer.densenet()
+
+elif options.arch == "trans_inception":
+    model = transfer.inception()
+
+elif options.arch == "trans_googlenet":
+    model = transfer.googlenet()
+
+elif options.arch == "trans_shufflenet":
+    model = transfer.shufflenet()
 
 else:
     print("Architecture don't exist!")

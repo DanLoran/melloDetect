@@ -4,11 +4,11 @@ trainAddr="dataset/Data/Images/"
 testAddr="dataset/Data/Images/"
 weightAddr="weight/"
 logAddr="logs/basic_runner.txt"
-architecture="resnet18"
+architecture="trans_shufflenet"
 
 python3 basic_runner.py \
 --debug=True \
---show-learning-curve=False \
+--show-learning-curve=True \
 --deploy-on-gpu=True \
 --run-validation=True \
 --checkpoint=False \

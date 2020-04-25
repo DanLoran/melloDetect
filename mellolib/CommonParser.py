@@ -1,4 +1,5 @@
 import argparse
+from mellolib.globalConstants import ARCH
 
 def DEBUGprint(message, opt):
     if (opt):
@@ -49,9 +50,6 @@ def basic_runner(parser):
                         help="Directory where training log will be saved. \
                         Default: ./log/")
 
-    parser.add_argument("--arch", type = str, choices=["zoo-resnet18",
-                                                       "tiny-fc",
-                                                       "tiny-cnn",
-                                                       "resnet18"],
+    parser.add_argument("--arch", type = str, choices=ARCH,
                         help="Neural network architecture. Default:\
                         zoo-resnet18" )
