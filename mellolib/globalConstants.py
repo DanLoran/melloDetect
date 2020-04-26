@@ -2,6 +2,7 @@ FIELDS = {"MALIGNANT":0, "BENIGN":1}
 ARCH = ['tiny_fc',
         'tiny_cnn',
         'trans_resnet18',
+        'lorenzo_resnet18',
         'trans_mobilenet',
         'trans_alexnet',
         'trans_vgg',

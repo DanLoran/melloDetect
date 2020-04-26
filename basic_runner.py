@@ -16,7 +16,7 @@ import torch
 import argparse
 
 from visdom import Visdom
-from torch.optim import SGD
+from torch.optim import SGD, Adam
 from torch.nn import BCELoss
 from sklearn.metrics import roc_auc_score
 from torchvision.transforms import Compose
@@ -29,7 +29,7 @@ from datetime import datetime
 from mellolib import commonParser as cmp
 from mellolib.readData import MelloDataSet
 from mellolib.globalConstants import ARCH
-from mellolib.models import transfer
+from mellolib.models import transfer, lorenzo
 
 for library in ARCH:
     try:
@@ -68,6 +68,9 @@ if options.arch == "tiny_fc":
 
 elif options.arch == "tiny_cnn":
     model = tiny_cnn()
+
+elif options.arch == "lorenzo_resnet18":
+    model = lorenzo.resnet18()
 
 elif options.arch == "trans_resnet18":
     model = transfer.resnet18()
@@ -118,7 +121,7 @@ log = open(options.log_addr,"w+")
 cmp.DEBUGprint("Initialize runner. \n", options.debug)
 
 n_eps = 100
-optimizer = SGD(model.parameters(), lr=0.001)
+optimizer = Adam(model.parameters(), lr=0.00025)
 criterion = BCELoss()
 dataset = MelloDataSet(options.train_addr, transforms=Compose([Resize((256,256)), ToTensor()]))
 loader = torch.utils.data.DataLoader(dataset, batch_size=32, shuffle=True)
