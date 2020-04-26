@@ -1,5 +1,6 @@
 import torch
 import os
+import csv
 import numpy as np
 from torch.utils.data import Dataset
 from torchvision import transforms
@@ -14,16 +15,16 @@ class MelloDataSet(Dataset):
         if (subset is not None):
             subset_idx = FIELDS[subset]
 
-        with open(data_dir+"label.txt", "r") as f:
-            for line in f:
-                entry = line.split()
-                image_name = entry[0]
+        with open(data_dir+"label.csv", "r") as f:
+            reader = csv.reader(f)
+            for row in reader:
+                image_name = row[0]
 
                 if (subset is not None):
-                    label = [int(entry[1:][subset_idx])]
+                    label = [int(row[3:][subset_idx])]
 
                 else:
-                    label = entry[1:]
+                    label = row[3:]
                     label = [int(i) for i in label]
                 image_name = os.path.join(data_dir, image_name)
                 image_list.append(image_name)
