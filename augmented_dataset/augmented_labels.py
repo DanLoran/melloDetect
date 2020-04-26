@@ -25,6 +25,15 @@ if __name__ == "__main__":
             writer = csv.writer(dest_labels)
             reader = csv.reader(source_labels)
             for row in reader:
+
+                # Make the label one-hot encoding
+                if row[-1] == '0':
+                    row[-1] = '1'
+                    row.append('0')
+                elif row[-1] == '1':
+                    row[-1] = '0'
+                    row.append('1')
+
                 if row[0] in basename_to_augments_map:
                     for file in basename_to_augments_map[row[0]]:
                         writer.writerow([file] + row[1:])

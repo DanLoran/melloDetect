@@ -1,13 +1,15 @@
 #!/bin/bash
 
 FILES=../dataset/Data/Images/*
-DEST=Data/
+DEST=Data
+
+mkdir $DEST
 
 for f in $FILES
 do
   echo "Processing $f file..."
-  python3 augment.py $f Data/
+  python3 augment.py $f $DEST/
 done
 
 echo "Generating labels..."
-python3 augmented_labels.py ../dataset/label.csv Data/label.csv Data/
+python3 augmented_labels.py ../dataset/label.csv $DEST/label.csv $DEST/
