@@ -1,17 +1,17 @@
 #/bin/bash
 
-trainAddr="fakeData/trainData/"
-testAddr="fakeData/valData/"
+trainAddr="./augmented_dataset/Data/"
+testAddr="./augmented_dataset/Data/"
 weightAddr="weight/"
 logAddr="logs/basic_runner.txt"
-architecture="tiny_cnn"
+architecture="trans_resnet18"
 
 python3 basic_runner.py \
 --debug=True \
---show-learning-curve=False \
+--show-visdom=True \
 --deploy-on-gpu=False \
---run-validation=False \
---checkpoint=False \
+--run-validation=True \
+--checkpoint=True \
 --run-at-checkpoint=False \
 --train-addr=${trainAddr} \
 --val-addr=${testAddr} \

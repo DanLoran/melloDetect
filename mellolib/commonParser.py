@@ -11,8 +11,8 @@ def boolean_string(s):
     return s == 'True'
 
 def basic_runner(parser):
-    parser.add_argument("--show-learning-curve", type=boolean_string, default=True,
-                        help="Show the Learning curve in realtime. Default:\
+    parser.add_argument("--show-visdom", type=boolean_string, default=True,
+                        help="Plot the stats in realtime. Default:\
                         true" )
 
     parser.add_argument("--deploy-on-gpu", type=boolean_string, default=True,

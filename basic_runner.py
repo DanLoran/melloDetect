@@ -14,6 +14,7 @@
 
 import torch
 import argparse
+import numpy as np
 
 from visdom import Visdom
 from torch.optim import SGD, Adam
@@ -76,7 +77,7 @@ options = parser.parse_args()
 
 # Setup visdom
 viz = 0
-if(options.show_learning_curve):
+if(options.show_visdom):
     try:
         viz = Visdom()
     except Exception as e:
@@ -166,7 +167,6 @@ time = []
 
 # evaluation parameters
 if (options.run_validation):
-    cmp.DEBUGprint("Validating... \n", options.debug)
     test_dataset = MelloDataSet(options.val_addr, transforms=Compose([Resize((256,256)), ToTensor()]))
     test_loader = torch.utils.data.DataLoader(test_dataset, batch_size=BATCH_SIZE)
     eval_score = []
@@ -200,19 +200,19 @@ for ep in tqdm(range(EPOCHS)):
         log.write(str(loss.cpu().detach().numpy().item()))
         log.write("\n")
 
-        if (options.show_learning_curve):
+        if (options.show_visdom):
             losses.append(loss.cpu().detach().numpy())
             time.append(itr)
-            viz.line(X=time,Y=losses,win='viz1',name="Learning curve")
+            viz.line(X=time,Y=losses,win='viz1',name="Learning curve", opts={'linecolor': np.array([[0, 0, 255],]), 'title':"Learning curve"})
             itr+=1
 
         if options.run_validation:
             # evaluate the model
             eval_score.append(run_evaluation(test_loader))
-            if options.show_learning_curve:
-                viz.line(X = itr, Y = eval_score, win='viz2', name="Evaluation AUC")
+            if options.show_visdom:
+                viz.line(X =time, Y = eval_score, win='viz2', name="Evaluation AUC",  opts={'linecolor': np.array([[255, 0, 0],]), 'title':"AUC score"})
             else:
                 print("AUC: %f" %(eval_score[-1]))
-
-    torch.save(model.state_dict(),options.weight_addr + str(timestamp) + "_epoch_" +  str(ep))
+    if options.checkpoint:
+        torch.save(model.state_dict(),options.weight_addr + str(timestamp) + "_epoch_" +  str(ep))
 log.close()
