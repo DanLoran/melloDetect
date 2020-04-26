@@ -133,8 +133,8 @@ cmp.DEBUGprint("Training... \n", options.debug)
 # current date and time
 now = datetime.now()
 
-time = datetime.timestamp(now)
-timestamp = datetime.fromtimestamp(time)
+date = datetime.timestamp(now)
+timestamp = datetime.fromtimestamp(date)
 print("Start training at ", timestamp)
 
 # Begin Training (ignore tqdm, it is just a progress bar GUI)
