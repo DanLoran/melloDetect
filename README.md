@@ -24,18 +24,21 @@ For models you wrote from scratch:
 3. Add an if statement in the `model_selection()` function in `mellolib/commonParser.py` for your model.
 4. You can start calling your model in the config files.
 
-## Running basic_runner
-The basic runner run SGD optimization method with loss calculation using BCE
-equation. The runner can be executed on GPU. It will run for 10 epochs with
-batch size of 32. The Learning rate is set at 0.01. The runner will only consider subset="MALIGNANT" label. The validation metric is ROC AUC score. For more info, do
+## Training runners
+Runner files are located in `./runners`, they are python script that stitch all mellolib and pytorch routine together to train a model. There are:
+1. `basic_runner.py` which can only do a limited range of training, but it is fast to develop/test new architecture. It can also be used as template to develope more sophisticated runners. The runner will train with: Adam optimizer doing Binary Cross Entropy Loss calculation. The runner will run for 10 epochs with batch size of 32 and learning rate of 0.001. The evaluation metric is AUC.
+2. `beefy_runner.py` is an extension of `basic_runner.py` that allows you to specify optimizer, learning rate, momentum (if applicable), batch size, epoch number, loss function, shuffle input data, evaluation type, on top of all parameters provided by `basic_runner.py`.
+
+To see the list of parameters, do
 ```
-python3 basic_runner.py -h
+python3 <runner> -h
 ```
-To run a visualization plot for learning curve, do:
+There are 2 ways of calling the runner. You can do it manually by specifying all required parameters. For example
 ```
-python3 -m visdom.server
+python3 basic_runner.py --debug=True --show-visdom=True --deploy-on-gpu=True --run-validation=True --checkpoint=False --run-at-checkpoint=False --train-addr=/home/minh/git/melloDetect/augmented_dataset/Data/ --val-addr=/home/minh/git/melloDetect/augmented_dataset/Data/ --weight-addr=/home/minh/git/melloDetect/weight/ --log-addr=/home/minh/git/melloDetect/logs/basic_runner.txt --arch=tiny_cnn
+
 ```
-The previous command will setup a port connection to http://localhost:8097/. Proceed to that link to open up the plotting platform. Afterward, to run an example of basic_runner.py (remember to set the dataset directory correctly in the run_basic_runner.sh), do on a seperate terminal:
+Or you can put all parameters in a `.cfg` file with each parameter on its own line. For example:
 ```
-bash run_basic_runner
+python3 basic_runner.p --file ./cfg/basic_runner_example.cfg
 ```

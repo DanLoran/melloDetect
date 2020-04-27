@@ -26,11 +26,14 @@ from torchvision.transforms import ToTensor
 from torchvision.transforms import Scale
 from tqdm import tqdm
 from datetime import datetime
+import sys
+sys.path.append('../')
 
 from mellolib import commonParser as cmp
 from mellolib.readData import MelloDataSet
 from mellolib.globalConstants import ARCH
 from mellolib.models import transfer
+from mellolib.eval import eval_auc
 
 ############################ Setup parser ######################################
 parser = argparse.ArgumentParser()
@@ -82,10 +85,8 @@ cmp.DEBUGprint("Initialize runner. \n", options.debug)
 ########################## Training setup ######################################
 n_eps = options.epoch
 batch_size = options.batch_size
-lr = options.lr
-optfunc = optimizer_selection(options.optimizer)
-optimizer = optfunc(model.parameters(), lr)
-criterion = criterion_selection(options.criterion)
+optimizer = cmp.optimizer_selection(options.optimizer, model.parameters(), options.lr, options.momentum)
+criterion = cmp.criterion_selection(options.criterion)
 dataset = MelloDataSet(options.train_addr, transforms=Compose([Resize((256,256)), ToTensor()]))
 loader = torch.utils.data.DataLoader(dataset, batch_size=batch_size, shuffle=options.shuffle)
 
@@ -140,12 +141,20 @@ for ep in tqdm(range(n_eps)):
 
         if options.run_validation:
             # evaluate the model
-            eval_score.append(run_evaluation(test_loader, options, model))
-            if options.show_visdom:
-                viz.line(X =time, Y = eval_score, win='viz2', name="Evaluation AUC",
-                opts={'linecolor': np.array([[255, 0, 0],]), 'title':"AUC score"})
+            if options.eval_type == "AUC":
+                eval_score.append(eval_auc(test_loader, options, model))
+                eval_name = "AUC Score "
             else:
-                print("AUC: %f" %(eval_score[-1]))
+                print("Error: evaluation not implemented!")
+                exit(0)
+
+            # show evaluation
+            if options.show_visdom:
+                viz.line(X =time, Y = eval_score, win='viz2', name=eval_name,
+                opts={'linecolor': np.array([[255, 0, 0],]), 'title':eval_name})
+            else:
+                print(eval_name + str(eval_score))
+
     if options.checkpoint:
         torch.save(model.state_dict(),options.weight_addr + str(timestamp) + "_epoch_" +  str(ep))
 log.close()

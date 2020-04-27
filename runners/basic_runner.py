@@ -81,7 +81,7 @@ log = open(options.log_addr,"w+")
 cmp.DEBUGprint("Initialize runner. \n", options.debug)
 
 ########################## Training setup ######################################
-n_eps = 100
+n_eps = 10
 batch_size = 32
 lr = 0.001
 optimizer = Adam(model.parameters(), lr=lr)
@@ -143,6 +143,8 @@ for ep in tqdm(range(n_eps)):
             if options.show_visdom:
                 viz.line(X =time, Y = eval_score, win='viz2', name="Evaluation AUC",
                 opts={'linecolor': np.array([[255, 0, 0],]), 'title':"AUC score"})
+            else:
+                print("AUC score:" + str(eval_score))
     if options.checkpoint:
         torch.save(model.state_dict(),options.weight_addr + str(timestamp) + "_epoch_" +  str(ep))
 log.close()

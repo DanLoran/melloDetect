@@ -4,6 +4,7 @@ from mellolib.models import transfer
 from mellolib.globalConstants import ARCH
 from mellolib.globalConstants import LOSS
 from mellolib.globalConstants import OPTIM
+from mellolib.globalConstants import EVAL
 
 for library in ARCH:
     try:
@@ -63,12 +64,12 @@ def model_selection(choice):
 
     return model
 
-def optimizer_selection(choice):
+def optimizer_selection(choice, params, lr, momentum):
     if choice == "SGD":
-        optimizer = torch.optim.SGD()
+        optimizer = torch.optim.SGD(params, lr=lr, momentum=momentum)
 
     elif choice == "Adam":
-        optimizer = torch.optim.Adam()
+        optimizer = torch.optim.Adam(params, lr=lr)
 
     else:
         print("Optimizer don't exist!")
@@ -153,3 +154,6 @@ def beefy_runner(parser):
 
     parser.add_argument("--shuffle", type=boolean_string, default=True,
                         help="Shuffle data during training. Default: true")
+
+    parser.add_argument("--eval-type", type= str, default=EVAL,
+                        help="Evaluation type")
