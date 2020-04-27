@@ -7,7 +7,12 @@ make docker     // create docker image
 make run        // run container and starts the visdom server
 make exec       // exec into the container with the current directory mounted as working volume
 ```
-Once you are inside the container, you can run the Python scripts as described below.
+## :warning:	Downloading data :warning:
+To download the ISIC data, do:
+```
+bash ./dataset/getData.sh
+```
+DO NOT run the `dataset/getData.sh` inside this repo. Copy the entier `./dataset` folder and put it somewhere with large storage space before downloading.
 
 ## :warning:	Adding new architectures :warning:
 It is crucial to follow the provided steps when adding a new architecture. We want everyone to be able to use the pipeline without any hickups. Inserting your own architecture midway in a runner file may make the runner break, and worse, if you push the runner that has a hard-code architecture in and someone else use it without knowing they are training your model! So don't be lazy :wink:, these steps will isolate your model under development from the rest of the pipeline:
