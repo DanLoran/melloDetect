@@ -19,18 +19,20 @@ import numpy as np
 from visdom import Visdom
 from torch.optim import SGD, Adam
 from torch.nn import BCELoss
-from sklearn.metrics import roc_auc_score
 from torchvision.transforms import Compose
 from torchvision.transforms import Resize
 from torchvision.transforms import ToTensor
 from torchvision.transforms import Scale
 from tqdm import tqdm
 from datetime import datetime
+import sys
+sys.path.append('../')
 
 from mellolib import commonParser as cmp
 from mellolib.readData import MelloDataSet
 from mellolib.globalConstants import ARCH
 from mellolib.models import transfer
+from mellolib.eval import eval_auc
 
 ############################ Setup parser ######################################
 parser = argparse.ArgumentParser()
@@ -137,12 +139,10 @@ for ep in tqdm(range(n_eps)):
 
         if options.run_validation:
             # evaluate the model
-            eval_score.append(run_evaluation(test_loader, options, model))
+            eval_score.append(eval_auc(test_loader, options, model))
             if options.show_visdom:
                 viz.line(X =time, Y = eval_score, win='viz2', name="Evaluation AUC",
                 opts={'linecolor': np.array([[255, 0, 0],]), 'title':"AUC score"})
-            else:
-                print("AUC: %f" %(eval_score[-1]))
     if options.checkpoint:
         torch.save(model.state_dict(),options.weight_addr + str(timestamp) + "_epoch_" +  str(ep))
 log.close()

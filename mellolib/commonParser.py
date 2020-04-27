@@ -5,6 +5,17 @@ from mellolib.globalConstants import ARCH
 from mellolib.globalConstants import LOSS
 from mellolib.globalConstants import OPTIM
 
+for library in ARCH:
+    try:
+        if('trans' not in library):
+            exec("from mellolib.models.{module} import {module}".format(module=library))
+    except Exception as e:
+        print(e)
+
+class LoadFromFile (argparse.Action):
+    def __call__(self, parser, namespace, values, option_string = None):
+        with values as f:
+            parser.parse_args(f.read().split(), namespace)
 
 def DEBUGprint(message, choice):
     if (choice):
@@ -76,6 +87,9 @@ def criterion_selection(choice):
     return criterion
 
 def basic_runner(parser):
+
+    parser.add_argument("--file", type=open, action=LoadFromFile)
+
     parser.add_argument("--show-visdom", type=boolean_string, default=True,
                         help="Plot the stats in realtime. Default:\
                         true" )

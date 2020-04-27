@@ -1,6 +1,7 @@
 import torch
+from sklearn.metrics import roc_auc_score
 
-def run_evaluation(test_loader, options, model):
+def eval_auc(test_loader, options, model):
     # Initialize two empty vectors that we can use in the future for storing aggregated ground truth (gt)
     # and model prediction (pred) information.
     gt = torch.FloatTensor()
