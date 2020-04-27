@@ -7,6 +7,10 @@ for file in sorted(os.listdir('Data/Descriptions')):
 
     targetstr = 'age_approx'
     res = [x for x in filetext if re.search(targetstr, x)]
+
+    if res == []:
+        continue
+
     age = res[0].strip().split(":")[1]
     age = age.replace(' ','')
     age = age.replace(',','')
@@ -20,7 +24,7 @@ for file in sorted(os.listdir('Data/Descriptions')):
         sex = 1
     else:
         sex = -1
-    
+
     targetstr = 'benign_malignant'
     res = [x for x in filetext if re.search(targetstr, x)]
     if('"benign"' in res[0]):
