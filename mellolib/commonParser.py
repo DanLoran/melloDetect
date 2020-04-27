@@ -1,14 +1,79 @@
 import argparse
+import torch
+from mellolib.models import transfer
 from mellolib.globalConstants import ARCH
+from mellolib.globalConstants import LOSS
+from mellolib.globalConstants import OPTIM
 
-def DEBUGprint(message, opt):
-    if (opt):
+
+def DEBUGprint(message, choice):
+    if (choice):
         print(message)
 
 def boolean_string(s):
     if s not in {'False', 'True'}:
         raise ValueError('Not a valid boolean string')
     return s == 'True'
+
+def model_selection(choice):
+    if choice == "tiny_fc":
+        model = tiny_fc()
+
+    elif choice == "tiny_cnn":
+        model = tiny_cnn()
+
+    elif choice == "trans_resnet18":
+        model = transfer.resnet18()
+
+    elif choice == "trans_mobilenet":
+        model = transfer.mobilenet()
+
+    elif choice == "trans_alexnet":
+        model = transfer.alexnet()
+
+    elif choice == "trans_vgg":
+        model = transfer.vgg()
+
+    elif choice == "trans_densenet":
+        model = transfer.densenet()
+
+    elif choice == "trans_inception":
+        model = transfer.inception()
+
+    elif choice == "trans_googlenet":
+        model = transfer.googlenet()
+
+    elif choice == "trans_shufflenet":
+        model = transfer.shufflenet()
+
+    else:
+        print("Architecture don't exist!")
+        exit(1)
+
+    return model
+
+def optimizer_selection(choice):
+    if choice == "SGD":
+        optimizer = torch.optim.SGD()
+
+    elif choice == "Adam":
+        optimizer = torch.optim.Adam()
+
+    else:
+        print("Optimizer don't exist!")
+        exit(1)
+
+    return optimizer
+
+def criterion_selection(choice):
+    if choice == "BCE":
+        criterion = torch.nn.BCELoss()
+
+    else:
+        print("Criterion don't exist!")
+        exit(1)
+
+    return criterion
 
 def basic_runner(parser):
     parser.add_argument("--show-visdom", type=boolean_string, default=True,
@@ -52,3 +117,25 @@ def basic_runner(parser):
 
     parser.add_argument("--arch", type = str, choices=ARCH,
                         help="Neural network architecture")
+
+def beefy_runner(parser):
+    parser.add_argument("--optimizer", type = str, choices=OPTIM,
+                        help="Optimization options")
+
+    parser.add_argument("--lr", type = float, default=0.001,
+                        help="Learning rate. Default: 0.001")
+
+    parser.add_argument("--momentum", type = float, default=0.9,
+                        help="Momentum. Default: 0.9")
+
+    parser.add_argument("--batch-size", type = int, default=32,
+                        help="Batch size. Default: 32")
+
+    parser.add_argument("--epoch", type = int, default=1,
+                        help="Number of epochs. Default: 1")
+
+    parser.add_argument("--criterion", type = str, choices=LOSS,
+                        help="Loss equations.")
+
+    parser.add_argument("--shuffle", type=boolean_string, default=True,
+                        help="Shuffle data during training. Default: true")

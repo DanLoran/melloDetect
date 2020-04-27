@@ -35,6 +35,7 @@ from mellolib.models import transfer
 ############################ Setup parser ######################################
 parser = argparse.ArgumentParser()
 cmp.basic_runner(parser)
+cmp.beefy_runner(parser)
 options = parser.parse_args()
 
 ##################### Setup visdom visualization ###############################
@@ -79,13 +80,15 @@ log = open(options.log_addr,"w+")
 cmp.DEBUGprint("Initialize runner. \n", options.debug)
 
 ########################## Training setup ######################################
-n_eps = 100
-batch_size = 32
-lr = 0.001
-optimizer = Adam(model.parameters(), lr=lr)
-criterion = BCELoss()
+n_eps = options.epoch
+batch_size = options.batch_size
+lr = options.lr
+optfunc = optimizer_selection(options.optimizer)
+optimizer = optfunc(model.parameters(), lr)
+criterion = criterion_selection(options.criterion)
 dataset = MelloDataSet(options.train_addr, transforms=Compose([Resize((256,256)), ToTensor()]))
-loader = torch.utils.data.DataLoader(dataset, batch_size=batch_size, shuffle=True)
+loader = torch.utils.data.DataLoader(dataset, batch_size=batch_size, shuffle=options.shuffle)
+
 batch_n = 0
 itr = 0
 losses = []
