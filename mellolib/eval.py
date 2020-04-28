@@ -57,7 +57,12 @@ def eval_accuracy(test_loader, options, model):
     gt = np.asarray(gt)
     total = 0
     corr = 0
-    for i in range(gt.shape[0]):
+
+    min_size = gt.shape[0]
+    if (options.acc_sample_size != -1):
+        min_size = min(gt.shape[0],options.acc_sample_size)
+
+    for i in range(min_size):
         truth = list(gt[i])
         if (pred[i][0] > pred[i][1]):
             vote = [1,0]

@@ -140,8 +140,8 @@ def beefy_runner(parser):
     parser.add_argument("--lr", type = float, default=0.001,
                         help="Learning rate. Default: 0.001")
 
-    parser.add_argument("--momentum", type = float, default=0.9,
-                        help="Momentum. Default: 0.9")
+    parser.add_argument("--momentum", type = float, default=-1.0,
+                        help="Momentum. Default: -1.0")
 
     parser.add_argument("--batch-size", type = int, default=32,
                         help="Batch size. Default: 32")
@@ -157,3 +157,9 @@ def beefy_runner(parser):
 
     parser.add_argument("--eval-type", type= str, default=EVAL,
                         help="Evaluation type")
+
+    parser.add_argument("--acc-sample-size", type = int, default=-1,
+                        help="Sample size of accuracy validation. Default: -1")
+
+    parser.add_argument("--val-frequency", type = int, default=1,
+                        help="Number of training iterations until run evaluation. Default: 1")

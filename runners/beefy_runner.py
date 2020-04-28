@@ -110,12 +110,14 @@ now = datetime.now()
 
 date = datetime.timestamp(now)
 timestamp = datetime.fromtimestamp(date)
+itr = 0
 print("Start training at ", timestamp)
 
 # Begin Training (ignore tqdm, it is just a progress bar GUI)
 model.train()
 for ep in tqdm(range(n_eps)):
     for inp, target in loader:
+        itr += 1
         if options.deploy_on_gpu:
             target = torch.autograd.Variable(target).cuda()
             inp = torch.autograd.Variable(inp).cuda()
@@ -139,7 +141,7 @@ for ep in tqdm(range(n_eps)):
             opts={'linecolor': np.array([[0, 0, 255],]), 'title':"Learning curve"})
             itr+=1
 
-        if options.run_validation:
+        if (options.run_validation == True and (itr % options.val_frequency == 0)):
             # evaluate the model
             if options.eval_type == "AUC":
                 eval_score.append(eval_auc(test_loader, options, model))
