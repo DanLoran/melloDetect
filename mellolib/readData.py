@@ -26,6 +26,10 @@ class MelloDataSet(Dataset):
                 else:
                     label = row[3:]
                     label = [int(i) for i in label]
+
+                #WARNING the positive class is BENIGN, hot fix here:
+                label.reverse()
+
                 image_name = os.path.join(data_dir, image_name)
                 image_list.append(image_name)
                 labels.append(label)
