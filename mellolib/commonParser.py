@@ -155,7 +155,7 @@ def beefy_runner(parser):
     parser.add_argument("--shuffle", type=boolean_string, default=True,
                         help="Shuffle data during training. Default: true")
 
-    parser.add_argument("--eval-type", type= str, default=EVAL,
+    parser.add_argument("--eval-type", type= str, choices=EVAL,
                         help="Evaluation type")
 
     parser.add_argument("--acc-sample-size", type = int, default=-1,
