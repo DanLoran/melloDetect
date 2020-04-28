@@ -77,9 +77,12 @@ dataset = MelloDataSet(options.train_addr, transforms=Compose([Resize((256,256))
 loader = torch.utils.data.DataLoader(dataset, batch_size=batch_size, shuffle=options.shuffle)
 
 batch_n = 0
-itr = 0
+loop_itr = 0
+viz_itr = 0
+val_itr = 0
 losses = []
-time = []
+viz_time = []
+val_time = []
 
 # evaluation parameters
 if (options.run_validation):
@@ -96,14 +99,13 @@ now = datetime.now()
 
 date = datetime.timestamp(now)
 timestamp = datetime.fromtimestamp(date)
-itr = 0
 print("Start training at ", timestamp)
 
 # Begin Training (ignore tqdm, it is just a progress bar GUI)
 model.train()
 for ep in tqdm(range(n_eps)):
     for inp, target in loader:
-        itr += 1
+        loop_itr += 1
         if options.deploy_on_gpu:
             target = torch.autograd.Variable(target).cuda()
             inp = torch.autograd.Variable(inp).cuda()
@@ -122,12 +124,12 @@ for ep in tqdm(range(n_eps)):
 
         if options.show_visdom:
             losses.append(loss.cpu().detach().numpy())
-            time.append(itr)
-            viz.line(X=time,Y=losses,win='viz1', name="Learning curve",
+            viz_time.append(viz_itr)
+            viz.line(X=viz_time,Y=losses,win='viz1', name="Learning curve",
             opts={'linecolor': np.array([[0, 0, 255],]), 'title':"Learning curve"})
-            itr+=1
+            viz_itr+=1
 
-        if (options.run_validation == True and (itr % options.val_frequency == 0)):
+        if (options.run_validation == True and (loop_itr % options.val_frequency == 0)):
             # evaluate the model
             if options.eval_type == "AUC":
                 eval_score.append(eval_auc(test_loader, options, model))
@@ -155,8 +157,10 @@ for ep in tqdm(range(n_eps)):
 
             # show evaluation
             if options.show_visdom:
-                viz.line(X =time, Y = eval_score, win='viz2', name=eval_name,
+                val_time.append(val_itr)
+                viz.line(X =val_time, Y = eval_score, win='viz2', name=eval_name,
                 opts={'linecolor': np.array([[255, 0, 0],]), 'title':eval_name})
+                val_itr+=1
             else:
                 print(eval_name + str(eval_score))
 
