@@ -25,8 +25,6 @@ def eval_auc(test_loader, options, model):
         pred = torch.cat((pred, out.cpu().detach()), 0)
         gt = torch.cat((gt, target.cpu().detach()), 0)
 
-        import IPython; IPython.embed()
-
     # Compute the model area under curve (AUC).
     auc = roc_auc_score(gt, pred)
     return auc
@@ -59,7 +57,7 @@ def eval_accuracy(test_loader, options, model):
     gt = np.asarray(gt)
     total = 0
     corr = 0
-    for i in range(min(gt.shape[0],100)):
+    for i in range(gt.shape[0]):
         truth = list(gt[i])
         if (pred[i][0] > pred[i][1]):
             vote = [1,0]
