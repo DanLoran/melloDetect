@@ -33,7 +33,7 @@ from mellolib import commonParser as cmp
 from mellolib.readData import MelloDataSet
 from mellolib.globalConstants import ARCH
 from mellolib.models import transfer
-from mellolib.eval import eval_auc
+from mellolib.eval import eval_auc, eval_accuracy
 
 ############################ Setup parser ######################################
 parser = argparse.ArgumentParser()
@@ -98,7 +98,7 @@ time = []
 # evaluation parameters
 if (options.run_validation):
     test_dataset = MelloDataSet(options.val_addr, transforms=Compose([Resize((256,256)), ToTensor()]))
-    test_loader = torch.utils.data.DataLoader(test_dataset, batch_size=batch_size)
+    test_loader = torch.utils.data.DataLoader(test_dataset, batch_size=1)
     eval_score = []
 
 cmp.DEBUGprint("Training... \n", options.debug)
@@ -144,6 +144,10 @@ for ep in tqdm(range(n_eps)):
             if options.eval_type == "AUC":
                 eval_score.append(eval_auc(test_loader, options, model))
                 eval_name = "AUC Score "
+
+            elif options.eval_type == "ACCURACY":
+                eval_score.append(eval_accuracy(test_loader, options, model))
+                eval_name = "Accuracy "
             else:
                 print("Error: evaluation not implemented!")
                 exit(0)

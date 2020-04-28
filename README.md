@@ -16,7 +16,7 @@ DO NOT run the `dataset/getData.sh` inside this repo. Copy the entier `./dataset
 
 To split the data into training and validation set, do something like:
 ```
-python3 makepartition.py --p 5 --source-addr <src> --train-addr <train> --val-addr <val> --max-pull 5000
+python3 dataset/makepartition.py --p 5 --source-addr <src> --train-addr <train> --val-addr <val> --max-pull 5000
 ```
 `--source-addr` is database address.
 

@@ -15,4 +15,5 @@ OPTIM = ['SGD',
 
 LOSS = ['BCE']
 
-EVAL = ['AUC']
+EVAL = ['AUC',
+        'ACCURACY']
