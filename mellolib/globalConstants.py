@@ -10,10 +10,8 @@ ARCH = ['tiny_fc',
         'trans_googlenet',
         'trans_shufflenet']
 
-OPTIM = ['SGD',
-         'Adam']
+OPTIM = ['SGD','Adam']
 
 LOSS = ['BCE']
 
-EVAL = ['AUC',
-        'ACCURACY']
+EVAL = ['AUC','ACCURACY','F1', 'PRECISION', 'RECALL']

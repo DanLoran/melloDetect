@@ -1,17 +1,3 @@
-################################################################################
-# Basic Runner: including validator option
-# Assuming Stochastic Gradient Descent optimization method with loss calculated
-# with CrossEntropyLoss equation.
-# The runner can be executed on the GPU.
-# The runner will run for 10 epochs with batch size of 32
-# The learning rate is set at 0.0001
-# The runner will only consider subset="MALIGNANT" label
-# The validation metric is ROC AUC score
-# Implementation inspired from UCD Chest X-ray Challenge found at:
-# https://github.com/hahnicity/ucd-cxr/blob/master/tutorial/basic.py
-# Authors: Gregory Rehm, Minh Truong
-################################################################################
-
 import torch
 import argparse
 import numpy as np
@@ -33,7 +19,7 @@ from mellolib import commonParser as cmp
 from mellolib.readData import MelloDataSet
 from mellolib.globalConstants import ARCH
 from mellolib.models import transfer
-from mellolib.eval import eval_auc, eval_accuracy
+from mellolib.eval import eval_auc, eval_accuracy, eval_f1, eval_precision, eval_recall
 
 ############################ Setup parser ######################################
 parser = argparse.ArgumentParser()
@@ -150,6 +136,19 @@ for ep in tqdm(range(n_eps)):
             elif options.eval_type == "ACCURACY":
                 eval_score.append(eval_accuracy(test_loader, options, model))
                 eval_name = "Accuracy "
+
+            elif options.eval_type == "F1":
+                eval_score.append(eval_f1(test_loader, options, model))
+                eval_name = "F1 Score "
+
+            elif options.eval_type == "PRECISION":
+                eval_score.append(eval_precision(test_loader, options, model))
+                eval_name = "Precision Score "
+
+            elif options.eval_type == "RECALL":
+                eval_score.append(eval_recall(test_loader, options, model))
+                eval_name = "Recall Score "
+
             else:
                 print("Error: evaluation not implemented!")
                 exit(0)
