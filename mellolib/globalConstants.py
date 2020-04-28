@@ -1,4 +1,4 @@
-FIELDS = {"MALIGNANT":0, "BENIGN":1}
+FIELDS = {"BENIGN":0, "MALIGNANT":1}
 ARCH = ['tiny_fc',
         'tiny_cnn',
         'trans_resnet18',
