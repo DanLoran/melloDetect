@@ -49,6 +49,7 @@ For models you wrote from scratch:
 Runner files are located in `./runners`, they are python script that stitch all mellolib and pytorch routine together to train a model. There are:
 1. `basic_runner.py` which can only do a limited range of training, but it is fast to develop/test new architecture. It can also be used as template to develope more sophisticated runners. The runner will train with: Adam optimizer doing Binary Cross Entropy Loss calculation. The runner will run for 10 epochs with batch size of 32 and learning rate of 0.001. The evaluation metric is AUC.
 2. `beefy_runner.py` is an extension of `basic_runner.py` that allows you to specify optimizer, learning rate, momentum (if applicable), batch size, epoch number, loss function, shuffle input data, evaluation type, on top of all parameters provided by `basic_runner.py`.
+3. `eval_runner.py` is an evaluation only runner that returns a range of evaluation metric given an architecture and a weight file.
 
 To see the list of parameters, do
 ```
