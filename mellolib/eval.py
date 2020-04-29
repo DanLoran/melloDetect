@@ -26,25 +26,19 @@ def generate_results(test_loader, options, model):
         gt = torch.cat((gt, target.cpu().detach()), 0)
 
     return gt, pred
-def eval_auc(test_loader, options, model):
-    gt, pred = generate_results(test_loader, options, model)
+def eval_auc(gt, pred):
     # Compute the model area under curve (AUC).
     auc = roc_auc_score(gt, pred)
     return auc
 
-def eval_accuracy(test_loader, options, model):
-    gt, pred = generate_results(test_loader, options, model)
+def eval_accuracy(gt, pred):
     # Compute Accuracy
     pred = np.asarray(pred)
     gt = np.asarray(gt)
     total = 0
     corr = 0
 
-    min_size = gt.shape[0]
-    if (options.acc_sample_size != -1):
-        min_size = min(gt.shape[0],options.acc_sample_size)
-
-    for i in range(min_size):
+    for i in range(gt.shape[0]):
         truth = list(gt[i])
         if (pred[i][0] > pred[i][1]):
             vote = [1,0]
@@ -56,27 +50,21 @@ def eval_accuracy(test_loader, options, model):
 
     return (corr / total) * 100
 
-def eval_f1(test_loader, options, model):
-    gt, pred = generate_results(test_loader, options, model)
-    # Compute F1 score
+def eval_f1(gt, pred):
     gt = np.argmax(gt, axis = 1)
     pred = np.argmax(pred, axis = 1)
     f1 = f1_score(gt, pred)
 
     return f1
 
-def eval_precision(test_loader, options, model):
-    gt, pred = generate_results(test_loader, options, model)
-    # Compute F1 score
+def eval_precision(gt, pred):
     gt = np.argmax(gt, axis = 1)
     pred = np.argmax(pred, axis = 1)
     precision = precision_score(gt, pred)
 
     return precision
 
-def eval_recall(test_loader, options, model):
-    gt, pred = generate_results(test_loader, options, model)
-    # Compute F1 score
+def eval_recall(gt, pred):
     gt = np.argmax(gt, axis = 1)
     pred = np.argmax(pred, axis = 1)
     recall = recall_score(gt, pred)

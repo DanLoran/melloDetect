@@ -19,7 +19,7 @@ from mellolib import commonParser as cmp
 from mellolib.readData import MelloDataSet
 from mellolib.globalConstants import ARCH
 from mellolib.models import transfer
-from mellolib.eval import eval_auc, eval_accuracy, eval_f1, eval_precision, eval_recall
+from mellolib.eval import eval_auc, eval_accuracy, eval_f1, eval_precision, eval_recall, generate_results
 
 ############################ Setup parser ######################################
 parser = argparse.ArgumentParser()
@@ -130,25 +130,26 @@ for ep in tqdm(range(n_eps)):
             viz_itr+=1
 
         if (options.run_validation == True and (loop_itr % options.val_frequency == 0)):
+            gt, pred = generate_results(test_loader, options, model)
             # evaluate the model
             if options.eval_type == "AUC":
-                eval_score.append(eval_auc(test_loader, options, model))
+                eval_score.append(eval_auc(gt, pred))
                 eval_name = "AUC Score "
 
             elif options.eval_type == "ACCURACY":
-                eval_score.append(eval_accuracy(test_loader, options, model))
+                eval_score.append(eval_accuracy(gt, pred))
                 eval_name = "Accuracy "
 
             elif options.eval_type == "F1":
-                eval_score.append(eval_f1(test_loader, options, model))
+                eval_score.append(eval_f1(gt, pred))
                 eval_name = "F1 Score "
 
             elif options.eval_type == "PRECISION":
-                eval_score.append(eval_precision(test_loader, options, model))
+                eval_score.append(eval_precision(gt, pred))
                 eval_name = "Precision Score "
 
             elif options.eval_type == "RECALL":
-                eval_score.append(eval_recall(test_loader, options, model))
+                eval_score.append(eval_recall(gt, pred))
                 eval_name = "Recall Score "
 
             else:
@@ -165,5 +166,13 @@ for ep in tqdm(range(n_eps)):
                 print(eval_name + str(eval_score))
 
     if options.checkpoint:
-        torch.save(model.state_dict(),options.weight_addr + str(timestamp) + "_epoch_" +  str(ep))
+        if (options.run_at_checkpoint):
+            dir = options.weight_addr.split('/')
+            save_name = ''
+            for i in range(len(dir) - 1):
+                save_name += '/'
+                save_name += dir[i]
+        else:
+            save_name = options.weight_addr
+        torch.save(model.state_dict(),save_name + str(timestamp) + "_epoch" +  str(ep))
 log.close()

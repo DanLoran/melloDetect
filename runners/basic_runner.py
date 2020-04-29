@@ -146,5 +146,13 @@ for ep in tqdm(range(n_eps)):
             else:
                 print("AUC score:" + str(eval_score))
     if options.checkpoint:
-        torch.save(model.state_dict(),options.weight_addr + str(timestamp) + "_epoch_" +  str(ep))
+        if (options.run_at_checkpoint):
+            dir = options.weight_addr.split('/')
+            save_name = ''
+            for i in range(len(dir) - 1):
+                save_name += '/'
+                save_name += dir[i]
+        else:
+            save_name = options.weight_addr
+        torch.save(model.state_dict(),save_name + str(timestamp) + "_epoch" +  str(ep))
 log.close()

@@ -158,8 +158,23 @@ def beefy_runner(parser):
     parser.add_argument("--eval-type", type= str, choices=EVAL,
                         help="Evaluation type")
 
-    parser.add_argument("--acc-sample-size", type = int, default=-1,
-                        help="Sample size of accuracy validation. Default: -1")
-
     parser.add_argument("--val-frequency", type = int, default=1,
                         help="Number of training iterations until run evaluation. Default: 1")
+
+def eval_runner(parser):
+    parser.add_argument("--file", type=open, action=LoadFromFile)
+
+    parser.add_argument("--deploy-on-gpu", type=boolean_string, default=True,
+                        help="Run the validator on the GPU. Default:\
+                        true" )
+
+    parser.add_argument("--eval-weight-addr", type=str, default="./weight/",
+                        help="Directory where all weight will be evaluated. Default: \
+                        ./weight/")
+
+    parser.add_argument("--val-addr", type=str, default="./valData/",
+                        help="Directory where validation dataset is stored. \
+                        Default:  ./valData/" )
+
+    parser.add_argument("--arch", type = str, choices=ARCH,
+                        help="Neural network architecture")
