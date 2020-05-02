@@ -31,7 +31,7 @@ sys.path.append('../')
 from mellolib import commonParser as cmp
 from mellolib.readData import MelloDataSet
 from mellolib.globalConstants import ARCH
-from mellolib.models import transfer
+from mellolib.models import *
 from mellolib.eval import eval_auc
 
 ############################ Setup parser ######################################

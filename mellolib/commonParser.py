@@ -1,6 +1,6 @@
 import argparse
 import torch
-from mellolib.models import transfer
+from mellolib.models import *
 from mellolib.globalConstants import ARCH
 from mellolib.globalConstants import LOSS
 from mellolib.globalConstants import OPTIM
