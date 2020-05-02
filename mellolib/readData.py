@@ -3,58 +3,49 @@ import os
 import csv
 import numpy as np
 from torch.utils.data import Dataset
-from torchvision import transforms
 from PIL import Image
 from mellolib.globalConstants import FIELDS
 
 class MelloDataSet(Dataset):
-    def __init__(self, data_dir, subset=None, transforms=None):
-        image_list = []
-        labels = []
+    """Class to import csv's containing classification data and features."""
 
-        if (subset is not None):
-            subset_idx = FIELDS[subset]
+    def __init__(self, labels_path, transforms=None):
+        """
+        Parameters
+        ----------
+        data_dir : str
+            Contains the absolute base filepath for the labels csv.
+        transforms : function
+            transformations to be applied to the image when read.
+        """
 
-        with open(data_dir+"label.csv", "r") as f:
-            reader = csv.reader(f)
-            for row in reader:
-                image_name = row[0] + '.jpeg'
-
-                if (subset is not None):
-                    label = [int(row[3:][subset_idx])]
-
-                else:
-                    label = row[3:]
-                    label = [int(i) for i in label]
-
-                image_name = os.path.join(data_dir, image_name)
-                image_list.append(image_name)
-                labels.append(label)
-
-        self.image_list = image_list
-        self.labels = labels
+        self.labels = []
+        self.image_list = []
         self.transforms = transforms
-        self.safe_image = 0
-        self.safe_label = 0
+
+        with open(os.path.join(labels_path, "label.csv"), "r") as f:
+            for row in csv.reader(f):
+                self.image_list.append(os.path.join(labels_path, row[0] + ".jpeg"))
+
+                # Convert to onehot. If label equals i set 1, else set 0.
+                label = int(row[3])
+                self.labels.append([int(label == i) for i in range(len(FIELDS))])
 
     def __getitem__(self, index):
-        image_name = self.image_list[index]
-        label = self.labels[index]
+        """
+        Parameters
+        ----------
+        index : int
+            Index of the image to be returned.
+        output : (<PIL image with a torch.float type>, <torch.FloatTensor>)
+        """
 
-        try:
-            image = Image.open(image_name)
-        except FileNotFoundError:
-            image = self.safe_image
-            label = self.safe_label
-            return image.type(torch.float), torch.FloatTensor(label)
+        image = Image.open(self.image_list[index])
 
         if (self.transforms is not None):
             image = self.transforms(image)
 
-        self.safe_image = image
-        self.safe_label = label
-
-        return image.type(torch.float), torch.FloatTensor(label)
+        return image.type(torch.float), torch.FloatTensor(self.labels[index])
 
     def __len__(self):
         return len(self.image_list)
