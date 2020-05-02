@@ -32,7 +32,7 @@ from mellolib import commonParser as cmp
 from mellolib.readData import MelloDataSet
 from mellolib.globalConstants import ARCH
 from mellolib.models import *
-from mellolib.eval import eval_auc
+from mellolib.eval import eval_auc, generate_results
 
 ############################ Setup parser ######################################
 parser = argparse.ArgumentParser()
@@ -138,8 +138,8 @@ for ep in tqdm(range(n_eps)):
             itr+=1
 
         if options.run_validation:
-            # evaluate the model
-            eval_score.append(eval_auc(test_loader, options, model))
+            gt, pred = generate_results(test_loader, options, model)
+            eval_score.append(eval_auc(gt, pred))
             if options.show_visdom:
                 viz.line(X =time, Y = eval_score, win='viz2', name="Evaluation AUC",
                 opts={'linecolor': np.array([[255, 0, 0],]), 'title':"AUC score"})
