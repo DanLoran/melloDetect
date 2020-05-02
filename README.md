@@ -18,11 +18,11 @@ To split the data into training and validation set, do something like:
 ```
 python3 dataset/makepartition.py --p 5 --source-addr <src> --train-addr <train> --val-addr <val> --max-pull 5000
 ```
-`--source-addr` is database address.
+`--source-addr` is path where the database is located.
 
-`--train-addr` is train address.
+`--train-addr` is the path for training data.
 
-`--val-addr` is validation address.
+`--val-addr` is path for validation data.
 
 `--p` is the percentage of images pulled from database that goes into validation set. (1-p) will go to train set
 
