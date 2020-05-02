@@ -30,7 +30,7 @@ from datetime import datetime
 from mellolib import commonParser as cmp
 from mellolib.readData import MelloDataSet
 from mellolib.globalConstants import ARCH
-from mellolib.models import transfer, lorenzo
+from mellolib.models import *
 
 """
 Evaluation function: validates data
