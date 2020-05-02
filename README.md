@@ -12,7 +12,7 @@ To download the ISIC data, do:
 ```
 bash ./dataset/getData.sh
 ```
-DO NOT run the `dataset/getData.sh` inside this repo. Copy the entier `./dataset` folder and put it somewhere with large storage space before downloading. The total space required is aroung 50GB. I recommend using this as using this as your database, never modify, augment or delete it. The images will be available in `Data/Images`
+DO NOT run the `dataset/getData.sh` inside this repo. Copy the entire `./dataset` folder and put it somewhere with large storage space before downloading. The total space required is aroung 50GB. I recommend using this as using this as your database, never modify, augment or delete it. The images will be available in `Data/Images`
 
 To split the data into training and validation set, do something like:
 ```
@@ -47,7 +47,7 @@ For models you wrote from scratch:
 
 ## Training runners
 Runner files are located in `./runners`, they are python script that stitch all mellolib and pytorch routine together to train a model. There are:
-1. `basic_runner.py` which can only do a limited range of training, but it is fast to develop/test new architecture. It can also be used as template to develope more sophisticated runners. The runner will train with: Adam optimizer doing Binary Cross Entropy Loss calculation. The runner will run for 10 epochs with batch size of 32 and learning rate of 0.001. The evaluation metric is AUC.
+1. `basic_runner.py` which can only do a limited range of training, but it is fast to develop/test new architecture. It can also be used as template to develop more sophisticated runners. The runner will train with: Adam optimizer doing Binary Cross Entropy Loss calculation. The runner will run for 10 epochs with batch size of 32 and learning rate of 0.001. The evaluation metric is AUC.
 2. `beefy_runner.py` is an extension of `basic_runner.py` that allows you to specify optimizer, learning rate, momentum (if applicable), batch size, epoch number, loss function, shuffle input data, evaluation type, on top of all parameters provided by `basic_runner.py`.
 3. `eval_runner.py` is an evaluation only runner that returns a range of evaluation metric given an architecture and a weight file.
 
@@ -62,5 +62,5 @@ python3 basic_runner.py --debug=True --show-visdom=True --deploy-on-gpu=True --r
 ```
 Or you can put all parameters in a `.cfg` file with each parameter on its own line. For example:
 ```
-python3 basic_runner.p --file ./cfg/basic_runner_example.cfg
+python3 basic_runner.py --file ./cfg/basic_runner_example.cfg
 ```
