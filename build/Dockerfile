@@ -12,3 +12,5 @@ RUN pip3 install \
 	argparse==1.4.0 \
 	visdom==0.1.8.9 \
 	tqdm==4.45.0
+
+RUN apt-get install -y git
