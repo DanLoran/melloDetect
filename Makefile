@@ -6,8 +6,8 @@ exec:
 	docker exec -it \
 	mello bash
 
-docker: Dockerfile
-	docker build -t mello:latest -f Dockerfile .
+docker: build/Dockerfile
+	docker build -t mello:latest -f build/Dockerfile .
 
 run:
 	docker run -d --rm \
