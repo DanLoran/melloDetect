@@ -161,6 +161,9 @@ def beefy_runner(parser):
     parser.add_argument("--val-frequency", type = int, default=1,
                         help="Number of training iterations until run evaluation. Default: 1")
 
+    parser.add_argument("--save-if-interupt", type=boolean_string, default=True,
+                        help="Save the weight if Ctrl+C interrupt. Default: true")
+
 def eval_runner(parser):
     parser.add_argument("--file", type=open, action=LoadFromFile)
 

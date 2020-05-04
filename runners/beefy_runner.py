@@ -103,69 +103,84 @@ print("Start training at ", timestamp)
 
 # Begin Training (ignore tqdm, it is just a progress bar GUI)
 model.train()
-for ep in tqdm(range(n_eps)):
-    for inp, target in loader:
-        loop_itr += 1
-        if options.deploy_on_gpu:
-            target = torch.autograd.Variable(target).cuda()
-            inp = torch.autograd.Variable(inp).cuda()
-        else:
-            target = torch.autograd.Variable(target)
-            inp = torch.autograd.Variable(inp)
 
-        optimizer.zero_grad()
-        out = model(inp)
-        loss = criterion(out, target)
-        loss.backward()
-        optimizer.step()
-
-        log.write(str(loss.cpu().detach().numpy().item()))
-        log.write("\n")
-
-        if options.show_visdom:
-            losses.append(loss.cpu().detach().numpy())
-            viz_time.append(viz_itr)
-            viz.line(X=viz_time,Y=losses,win='viz1', name="Learning curve",
-            opts={'linecolor': np.array([[0, 0, 255],]), 'title':"Learning curve"})
-            viz_itr+=1
-
-        if (options.run_validation == True and (loop_itr % options.val_frequency == 0)):
-            gt, pred = generate_results(test_loader, options, model)
-            # evaluate the model
-            if options.eval_type == "AUC":
-                eval_score.append(eval_auc(gt, pred))
-                eval_name = "AUC Score "
-
-            elif options.eval_type == "ACCURACY":
-                eval_score.append(eval_accuracy(gt, pred))
-                eval_name = "Accuracy "
-
-            elif options.eval_type == "F1":
-                eval_score.append(eval_f1(gt, pred))
-                eval_name = "F1 Score "
-
-            elif options.eval_type == "PRECISION":
-                eval_score.append(eval_precision(gt, pred))
-                eval_name = "Precision Score "
-
-            elif options.eval_type == "RECALL":
-                eval_score.append(eval_recall(gt, pred))
-                eval_name = "Recall Score "
-
+try:
+    for ep in tqdm(range(n_eps)):
+        for inp, target in loader:
+            loop_itr += 1
+            if options.deploy_on_gpu:
+                target = torch.autograd.Variable(target).cuda()
+                inp = torch.autograd.Variable(inp).cuda()
             else:
-                print("Error: evaluation not implemented!")
-                exit(0)
+                target = torch.autograd.Variable(target)
+                inp = torch.autograd.Variable(inp)
 
-            # show evaluation
+            optimizer.zero_grad()
+            out = model(inp)
+            loss = criterion(out, target)
+            loss.backward()
+            optimizer.step()
+
+            log.write(str(loss.cpu().detach().numpy().item()))
+            log.write("\n")
+
             if options.show_visdom:
-                val_time.append(val_itr)
-                viz.line(X =val_time, Y = eval_score, win='viz2', name=eval_name,
-                opts={'linecolor': np.array([[255, 0, 0],]), 'title':eval_name})
-                val_itr+=1
-            else:
-                print(eval_name + str(eval_score))
+                losses.append(loss.cpu().detach().numpy())
+                viz_time.append(viz_itr)
+                viz.line(X=viz_time,Y=losses,win='viz1', name="Learning curve",
+                opts={'linecolor': np.array([[0, 0, 255],]), 'title':"Learning curve"})
+                viz_itr+=1
 
-    if options.checkpoint:
+            if (options.run_validation == True and (loop_itr % options.val_frequency == 0)):
+                gt, pred = generate_results(test_loader, options, model)
+                # evaluate the model
+                if options.eval_type == "AUC":
+                    eval_score.append(eval_auc(gt, pred))
+                    eval_name = "AUC Score "
+
+                elif options.eval_type == "ACCURACY":
+                    eval_score.append(eval_accuracy(gt, pred))
+                    eval_name = "Accuracy "
+
+                elif options.eval_type == "F1":
+                    eval_score.append(eval_f1(gt, pred))
+                    eval_name = "F1 Score "
+
+                elif options.eval_type == "PRECISION":
+                    eval_score.append(eval_precision(gt, pred))
+                    eval_name = "Precision Score "
+
+                elif options.eval_type == "RECALL":
+                    eval_score.append(eval_recall(gt, pred))
+                    eval_name = "Recall Score "
+
+                else:
+                    print("Error: evaluation not implemented!")
+                    exit(0)
+
+                # show evaluation
+                if options.show_visdom:
+                    val_time.append(val_itr)
+                    viz.line(X =val_time, Y = eval_score, win='viz2', name=eval_name,
+                    opts={'linecolor': np.array([[255, 0, 0],]), 'title':eval_name})
+                    val_itr+=1
+                else:
+                    print(eval_name + str(eval_score))
+
+        if options.checkpoint:
+            if (options.run_at_checkpoint):
+                dir = options.weight_addr.split('/')
+                save_name = ''
+                for i in range(len(dir) - 1):
+                    save_name += '/'
+                    save_name += dir[i]
+            else:
+                save_name = options.weight_addr
+            torch.save(model.state_dict(),save_name + str(timestamp) + "_epoch" +  str(ep))
+    log.close()
+except KeyboardInterrupt:
+    if (options.save_if_interupt):
+        print("User interupt, runner will save and gracefully exit now")
         if (options.run_at_checkpoint):
             dir = options.weight_addr.split('/')
             save_name = ''
@@ -174,5 +189,4 @@ for ep in tqdm(range(n_eps)):
                 save_name += dir[i]
         else:
             save_name = options.weight_addr
-        torch.save(model.state_dict(),save_name + str(timestamp) + "_epoch" +  str(ep))
-log.close()
+        torch.save(model.state_dict(),save_name + 'interupt_' + str(timestamp))
