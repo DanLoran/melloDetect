@@ -19,63 +19,27 @@ import numpy as np
 from visdom import Visdom
 from torch.optim import SGD, Adam
 from torch.nn import BCELoss
-from sklearn.metrics import roc_auc_score
 from torchvision.transforms import Compose
 from torchvision.transforms import Resize
 from torchvision.transforms import ToTensor
 from torchvision.transforms import Scale
 from tqdm import tqdm
 from datetime import datetime
+import sys
+sys.path.append('../')
 
 from mellolib import commonParser as cmp
 from mellolib.readData import MelloDataSet
 from mellolib.globalConstants import ARCH
 from mellolib.models import *
+from mellolib.eval import eval_auc, generate_results
 
-"""
-Evaluation function: validates data
-@returns: (float) Area under the curve - auc
-"""
-def run_evaluation(test_loader):
-    # Initialize two empty vectors that we can use in the future for storing aggregated ground truth (gt)
-    # and model prediction (pred) information.
-    gt = torch.FloatTensor()
-    pred = torch.FloatTensor()
-
-    model.eval()
-    batch_n = 0
-    for inp, target in test_loader:
-
-        if (options.deploy_on_gpu):
-            target = torch.autograd.Variable(target).cuda()
-            inp = torch.autograd.Variable(inp).cuda()
-        else:
-            target = torch.autograd.Variable(target)
-            inp = torch.autograd.Variable(inp)
-
-        out = model(inp)
-        # Add results of the model's output to the aggregated prediction vector, and also add aggregated
-        # ground truth information as well
-        pred = torch.cat((pred, out.cpu().detach()), 0)
-        gt = torch.cat((gt, target.cpu().detach()), 0)
-
-    # Compute the model area under curve (AUC).
-    auc = roc_auc_score(gt, pred)
-    return auc
-
-for library in ARCH:
-    try:
-        if ('trans' not in library):
-            exec("from mellolib.models.{module} import {module}".format(module=library))
-    except Exception as e:
-        print(e)
-
-# Setup parser
+############################ Setup parser ######################################
 parser = argparse.ArgumentParser()
 cmp.basic_runner(parser)
 options = parser.parse_args()
 
-# Setup visdom
+##################### Setup visdom visualization ###############################
 viz = 0
 if(options.show_visdom):
     try:
@@ -90,49 +54,13 @@ if(options.show_visdom):
             "our GitHub.".format(repr(e))
         )
 
-# Choose architecture
+########################## Choose architecture #################################
 cmp.DEBUGprint("Loading model. \n", options.debug)
-model = 0
+model = cmp.model_selection(options.arch)
 
-# example mellolib model
-if options.arch == "tiny_fc":
-    model = tiny_fc()
+########################### Environment setup ##################################
 
-elif options.arch == "tiny_cnn":
-    model = tiny_cnn()
-
-elif options.arch == "lorenzo_resnet18":
-    model = lorenzo.resnet18()
-
-elif options.arch == "trans_resnet18":
-    model = transfer.resnet18()
-
-elif options.arch == "trans_mobilenet":
-    model = transfer.mobilenet()
-
-elif options.arch == "trans_alexnet":
-    model = transfer.alexnet()
-
-elif options.arch == "trans_vgg":
-    model = transfer.vgg()
-
-elif options.arch == "trans_densenet":
-    model = transfer.densenet()
-
-elif options.arch == "trans_inception":
-    model = transfer.inception()
-
-elif options.arch == "trans_googlenet":
-    model = transfer.googlenet()
-
-elif options.arch == "trans_shufflenet":
-    model = transfer.shufflenet()
-
-else:
-    print("Architecture don't exist!")
-    exit(1)
-
-# If deploy on gpu
+# Setup GPU
 if (options.deploy_on_gpu):
     if (not torch.cuda.is_available()):
         print("GPU device doesn't exist")
@@ -140,7 +68,7 @@ if (options.deploy_on_gpu):
         model = model.cuda()
         print("Deploying model on: " + torch.cuda.get_device_name(torch.cuda.current_device()) + "\n")
 
-# If resume training
+# Resume from checkpoint option
 cmp.DEBUGprint("Loading previous state. \n", options.debug)
 if options.run_at_checkpoint:
     model.load_state_dict(torch.load(options.weight_addr))
@@ -152,14 +80,14 @@ log = open(options.log_addr,"w+")
 # Basic runner stuff
 cmp.DEBUGprint("Initialize runner. \n", options.debug)
 
-# TODO: move the capitalized variables to configuration file or elsewhere
-EPOCHS = 100
-BATCH_SIZE = 32
-LEARNING_RATE = 0.00025
-optimizer = Adam(model.parameters(), lr=LEARNING_RATE)
+########################## Training setup ######################################
+n_eps = 10
+batch_size = 32
+lr = 0.001
+optimizer = Adam(model.parameters(), lr=lr)
 criterion = BCELoss()
 dataset = MelloDataSet(options.train_addr, transforms=Compose([Resize((256,256)), ToTensor()]))
-loader = torch.utils.data.DataLoader(dataset, batch_size=BATCH_SIZE, shuffle=True)
+loader = torch.utils.data.DataLoader(dataset, batch_size=batch_size, shuffle=True)
 batch_n = 0
 itr = 0
 losses = []
@@ -168,11 +96,13 @@ time = []
 # evaluation parameters
 if (options.run_validation):
     test_dataset = MelloDataSet(options.val_addr, transforms=Compose([Resize((256,256)), ToTensor()]))
-    test_loader = torch.utils.data.DataLoader(test_dataset, batch_size=BATCH_SIZE)
+    test_loader = torch.utils.data.DataLoader(test_dataset, batch_size=batch_size)
     eval_score = []
 
 cmp.DEBUGprint("Training... \n", options.debug)
 
+
+############################# Training loop ####################################
 # current date and time
 now = datetime.now()
 
@@ -182,7 +112,7 @@ print("Start training at ", timestamp)
 
 # Begin Training (ignore tqdm, it is just a progress bar GUI)
 model.train()
-for ep in tqdm(range(EPOCHS)):
+for ep in tqdm(range(n_eps)):
     for inp, target in loader:
         if options.deploy_on_gpu:
             target = torch.autograd.Variable(target).cuda()
@@ -200,19 +130,29 @@ for ep in tqdm(range(EPOCHS)):
         log.write(str(loss.cpu().detach().numpy().item()))
         log.write("\n")
 
-        if (options.show_visdom):
+        if options.show_visdom:
             losses.append(loss.cpu().detach().numpy())
             time.append(itr)
-            viz.line(X=time,Y=losses,win='viz1',name="Learning curve", opts={'linecolor': np.array([[0, 0, 255],]), 'title':"Learning curve"})
+            viz.line(X=time,Y=losses,win='viz1', name="Learning curve",
+            opts={'linecolor': np.array([[0, 0, 255],]), 'title':"Learning curve"})
             itr+=1
 
         if options.run_validation:
-            # evaluate the model
-            eval_score.append(run_evaluation(test_loader))
+            gt, pred = generate_results(test_loader, options, model)
+            eval_score.append(eval_auc(gt, pred))
             if options.show_visdom:
-                viz.line(X =time, Y = eval_score, win='viz2', name="Evaluation AUC",  opts={'linecolor': np.array([[255, 0, 0],]), 'title':"AUC score"})
+                viz.line(X =time, Y = eval_score, win='viz2', name="Evaluation AUC",
+                opts={'linecolor': np.array([[255, 0, 0],]), 'title':"AUC score"})
             else:
-                print("AUC: %f" %(eval_score[-1]))
+                print("AUC score:" + str(eval_score))
     if options.checkpoint:
-        torch.save(model.state_dict(),options.weight_addr + str(timestamp) + "_epoch_" +  str(ep))
+        if (options.run_at_checkpoint):
+            dir = options.weight_addr.split('/')
+            save_name = ''
+            for i in range(len(dir) - 1):
+                save_name += '/'
+                save_name += dir[i]
+        else:
+            save_name = options.weight_addr
+        torch.save(model.state_dict(),save_name + str(timestamp) + "_epoch" +  str(ep))
 log.close()

@@ -1,22 +1,35 @@
 import os
+import re
 target = open("label.csv","a")
-for file in os.listdir('Data/Descriptions'):
+for file in sorted(os.listdir('Data/Descriptions')):
     f = open('Data/Descriptions/'+file)
     filetext = f.readlines()
-    age = filetext[23].strip().split(":")[1]
+
+    targetstr = 'age_approx'
+    res = [x for x in filetext if re.search(targetstr, x)]
+
+    if res == []:
+        continue
+
+    age = res[0].strip().split(":")[1]
     age = age.replace(' ','')
     age = age.replace(',','')
-    sexstr = filetext[29].strip().split(":")[1]
-    if("female" in sexstr):
+    if(age == 'null'): age = -1
+
+    targetstr = 'sex'
+    res = [x for x in filetext if re.search(targetstr, x)]
+    if("female" in res[0]):
         sex = 0
-    elif("male" in sexstr):
+    elif("male" in res[0]):
         sex = 1
     else:
         sex = -1
-    malstr = filetext[25].strip().split(":")[1]
-    if("benign" in malstr):
+
+    targetstr = 'benign_malignant'
+    res = [x for x in filetext if re.search(targetstr, x)]
+    if('"benign"' in res[0]):
         mal = 0
-    elif("malignant" in malstr):
+    elif('"malignant"' in res[0]):
         mal = 1
     else:
         mal = -1

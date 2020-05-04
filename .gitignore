@@ -2,4 +2,5 @@ weight/
 augmented_dataset/Data
 mellolib/__pycache__
 mellolib/models/__pycache__
+logs/
 *.jpeg
