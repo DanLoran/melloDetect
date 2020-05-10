@@ -29,7 +29,7 @@ import sys
 sys.path.append('../')
 
 from mellolib import commonParser as cmp
-from mellolib.readData import MelloDataSet
+from mellolib.splitter import Splitter
 from mellolib.globalConstants import ARCH
 from mellolib.models import *
 from mellolib.eval import eval_auc, generate_results
@@ -86,7 +86,8 @@ batch_size = 32
 lr = 0.001
 optimizer = Adam(model.parameters(), lr=lr)
 criterion = BCELoss()
-dataset = MelloDataSet(options.train_addr, transforms=Compose([Resize((256,256)), ToTensor()]))
+dataset_generator = Splitter(options.data_addr, options.split, transforms=Compose([Resize((256,256)), ToTensor()]))
+dataset = dataset_generator.generate_training_data()
 loader = torch.utils.data.DataLoader(dataset, batch_size=batch_size, shuffle=True)
 batch_n = 0
 itr = 0
@@ -95,7 +96,7 @@ time = []
 
 # evaluation parameters
 if (options.run_validation):
-    test_dataset = MelloDataSet(options.val_addr, transforms=Compose([Resize((256,256)), ToTensor()]))
+    test_dataset = dataset_generator.generate_validation_data()
     test_loader = torch.utils.data.DataLoader(test_dataset, batch_size=batch_size)
     eval_score = []
 

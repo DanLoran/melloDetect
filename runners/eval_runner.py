@@ -25,7 +25,8 @@ options = parser.parse_args()
 ########################## Choose architecture #################################
 model = cmp.model_selection(options.arch)
 
-test_dataset = MelloDataSet(options.val_addr, transforms=Compose([Resize((256,256)), ToTensor()]))
+dataset_generator = Splitter(options.data_addr, options.split, transforms=Compose([Resize((256,256)), ToTensor()]))
+test_dataset = dataset_generator.generate_training_data()
 test_loader = torch.utils.data.DataLoader(test_dataset, batch_size=1)
 eval_score = []
 
