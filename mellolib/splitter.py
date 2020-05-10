@@ -44,6 +44,7 @@ class Splitter:
         # self.data contains a list of the form [('path', [label onehot]), ...].
         # This is the base data that all indexes below refer to.
         self.data = self.read_data(labels_path)
+        random.shuffle(self.data)
         
         # 0: benign, 1: malignant.
         # Indexes is a 2d array of the form
