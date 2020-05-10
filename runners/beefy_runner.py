@@ -16,7 +16,6 @@ import sys
 sys.path.append('../')
 
 from mellolib import commonParser as cmp
-from mellolib.readData import MelloDataSet
 from mellolib.splitter import Splitter
 from mellolib.globalConstants import ARCH
 from mellolib.models import transfer
