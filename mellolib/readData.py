@@ -8,6 +8,16 @@ from torch.utils.data import Dataset
 from PIL import Image
 from mellolib.globalConstants import FIELDS
 
+def DatasetFromPath(dataPath, transforms=None):
+    ImagePath = os.path.join(dataPath, "Images")
+    imageNameArray = np.array(sorted(os.listdir(ImagePath)))
+
+    labelPath = os.path.join(dataPath, "Descriptions")
+    labelNameArray = np.array(sorted(os.listdir(labelPath)))
+
+    ds = MelloDataSet(dataPath, imageNameArray, labelNameArray, transforms)
+    return ds
+
 """
 dataPath (string): the path to the directory that contains the data. It assumes
     it has a subdirectory "Images" with all the images, and a subdirectory
