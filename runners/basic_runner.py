@@ -29,7 +29,7 @@ import sys
 sys.path.append('../')
 
 from mellolib import commonParser as cmp
-from mellolib.readData import MelloDataSet
+from mellolib.readData import MelloDataSet, Split
 from mellolib.globalConstants import ARCH
 from mellolib.models import *
 from mellolib.eval import eval_auc, generate_results
@@ -80,14 +80,19 @@ log = open(options.log_addr,"w+")
 # Basic runner stuff
 cmp.DEBUGprint("Initialize runner. \n", options.debug)
 
+########################## Split data ########################################
+trainingDataset, testDataSet = Split(
+    options.train_addr,
+    options.split,
+    transforms=Compose([Resize((256,256)), ToTensor()]))
+
 ########################## Training setup ######################################
 n_eps = 10
 batch_size = 32
 lr = 0.001
 optimizer = Adam(model.parameters(), lr=lr)
 criterion = BCELoss()
-dataset = MelloDataSet(options.train_addr, transforms=Compose([Resize((256,256)), ToTensor()]))
-loader = torch.utils.data.DataLoader(dataset, batch_size=batch_size, shuffle=True)
+loader = torch.utils.data.DataLoader(trainingDataset, batch_size=batch_size, shuffle=True)
 batch_n = 0
 itr = 0
 losses = []
@@ -95,8 +100,7 @@ time = []
 
 # evaluation parameters
 if (options.run_validation):
-    test_dataset = MelloDataSet(options.val_addr, transforms=Compose([Resize((256,256)), ToTensor()]))
-    test_loader = torch.utils.data.DataLoader(test_dataset, batch_size=batch_size)
+    test_loader = torch.utils.data.DataLoader(testDataSet, batch_size=batch_size)
     eval_score = []
 
 cmp.DEBUGprint("Training... \n", options.debug)

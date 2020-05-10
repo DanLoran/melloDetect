@@ -122,6 +122,9 @@ def basic_runner(parser):
                         help="Directory where validation dataset is stored. \
                         Default:  ./valData/" )
 
+    parser.add_argument("--split", type=float, default=0.7,
+                        help="Split ratio. Default 0.7 (70% training)")
+
     parser.add_argument("--weight-addr", type=str, default="./weight/",
                         help="Directory where weight will be saved. Default: \
                         ./weight/")
