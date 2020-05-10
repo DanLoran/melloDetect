@@ -82,7 +82,7 @@ cmp.DEBUGprint("Initialize runner. \n", options.debug)
 
 ########################## Split data ########################################
 trainingDataset, testDataSet = Split(
-    options.train_addr,
+    options.data_addr,
     options.split,
     transforms=Compose([Resize((256,256)), ToTensor()]))
 

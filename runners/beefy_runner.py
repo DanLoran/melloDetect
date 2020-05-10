@@ -68,13 +68,18 @@ log = open(options.log_addr,"w+")
 # Basic runner stuff
 cmp.DEBUGprint("Initialize runner. \n", options.debug)
 
+########################## Split data ########################################
+trainingDataset, testDataSet = Split(
+    options.data_addr,
+    options.split,
+    transforms=Compose([Resize((256,256)), ToTensor()]))
+
 ########################## Training setup ######################################
 n_eps = options.epoch
 batch_size = options.batch_size
 optimizer = cmp.optimizer_selection(options.optimizer, model.parameters(), options.lr, options.momentum)
 criterion = cmp.criterion_selection(options.criterion)
-dataset = MelloDataSet(options.train_addr, transforms=Compose([Resize((256,256)), ToTensor()]))
-loader = torch.utils.data.DataLoader(dataset, batch_size=batch_size, shuffle=options.shuffle)
+loader = torch.utils.data.DataLoader(trainingDataset, batch_size=batch_size, shuffle=options.shuffle)
 
 batch_n = 0
 loop_itr = 0
@@ -86,8 +91,7 @@ val_time = []
 
 # evaluation parameters
 if (options.run_validation):
-    test_dataset = MelloDataSet(options.val_addr, transforms=Compose([Resize((256,256)), ToTensor()]))
-    test_loader = torch.utils.data.DataLoader(test_dataset, batch_size=1)
+    test_loader = torch.utils.data.DataLoader(testDataSet, batch_size=1)
     eval_score = []
 
 cmp.DEBUGprint("Training... \n", options.debug)
