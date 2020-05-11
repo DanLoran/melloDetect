@@ -1,6 +1,51 @@
 import torch
 import numpy as np
-from sklearn.metrics import roc_auc_score, f1_score, precision_score, recall_score
+from sklearn.metrics import roc_auc_score, f1_score, precision_score, recall_score, confusion_matrix
+
+def eval_selection(test_loader, options, model):
+    gt, pred = generate_results(test_loader, options, model)
+    # evaluate the model
+    if options.eval_type == "AUC":
+        eval_score = val_auc(gt, pred)
+        eval_name = "AUC Score "
+
+    elif options.eval_type == "ACCURACY":
+        eval_score = val_accuracy(gt, pred)
+        eval_name = "Accuracy "
+
+    elif options.eval_type == "F1":
+        eval_score = val_f1(gt, pred)
+        eval_name = "F1 Score "
+
+    elif options.eval_type == "PRECISION":
+        eval_score = val_precision(gt, pred)
+        eval_name = "Precision Score "
+
+    elif options.eval_type == "RECALL":
+        eval_score = val_recall(gt, pred)
+        eval_name = "Recall Score "
+
+    elif options.eval_type == "TN":
+        eval_score,_,_,_ = eval_confuse(gt, pred)
+        eval_name = "True Negative "
+
+    elif options.eval_type == "TP":
+        _,eval_score,_,_ = eval_confuse(gt, pred)
+        eval_name = "True Positive "
+
+    elif options.eval_type == "FN":
+        _,_,eval_score,_ = eval_confuse(gt, pred)
+        eval_name = "False Negative "
+
+    elif options.eval_type == "FP":
+        _,_,_,eval_score = eval_confuse(gt, pred)
+        eval_name = "False Positive "
+
+    else:
+        print("Error: evaluation not implemented!")
+        exit(0)
+
+    return eval_score, eval_name
 
 def generate_results(test_loader, options, model):
     # Initialize two empty vectors that we can use in the future for storing aggregated ground truth (gt)
@@ -70,3 +115,9 @@ def eval_recall(gt, pred):
     recall = recall_score(gt, pred)
 
     return recall
+
+def eval_confuse(gt, pred):
+    gt = np.argmax(gt, axis = 1)
+    pred = np.argmax(pred, axis = 1)
+    tn, fp, fn, tp = confusion_matrix(gt, pred).ravel()
+    return tn, tp, fn, fp
