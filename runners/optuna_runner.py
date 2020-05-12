@@ -15,7 +15,7 @@ from collections import OrderedDict
 import sys
 sys.path.append('../')
 
-from mellolib.eval import generate_results, eval_accuracy
+from mellolib.eval import generate_results, eval_recall
 from mellolib import commonParser as cmp
 from mellolib.readData import MelloDataSet
 from mellolib.globalConstants import ARCH
@@ -41,7 +41,7 @@ def train(model, loader, criterion, optimizer, epoch, options):
         loss.backward()
         optimizer.step()
 
-        if batch_idx % options.val_frequency == 0:
+        if batch_idx % 10 == 0:
           print('Train Epoch: {} [{}/{} ({:.0f}%)]\tLoss: {:.6f}'.format(
                 epoch, batch_idx * len(inp), len(loader.dataset),
                 100. * batch_idx / len(loader), loss.item()))
@@ -49,8 +49,8 @@ def train(model, loader, criterion, optimizer, epoch, options):
 def test(model, loader, options):
     with torch.no_grad():
         gt, pred = generate_results(loader, options, model)
-    accuracy = eval_accuracy(gt,pred)
-    return accuracy
+    score = eval_recall(gt,pred)
+    return score
 
 def objective(trial, options):
     train_dataset = MelloDataSet(options.train_addr, transforms=Compose([Resize((256,256)), ToTensor()]))
@@ -107,7 +107,7 @@ def objective(trial, options):
 
     #----------------------------------------------------------------#
     optimizer_list = {'SGD': optim.SGD, 'RMSprop': optim.RMSprop, 'Adam': optim.Adam}
-    optimizer_name = trial.suggest_categorical('optimizer',['SGD','RMSprop','Adam'])
+    #optimizer_name = trial.suggest_categorical('optimizer',['SGD','RMSprop','Adam'])
 
     optimizer = optimizer_list['Adam'](model.parameters(), lr=lr)
     # if (optimizer_name == 'SGD' or optimizer_name = 'RMSprop'):
@@ -126,12 +126,14 @@ def objective(trial, options):
     timestamp = datetime.fromtimestamp(date)
     for epoch in range(options.epoch):
         train(model, train_loader, criterion, optimizer, epoch, options)
-        test_accuracy = test(model, test_loader, options)
+        test_score = test(model, test_loader, options)
 
         if options.checkpoint:
-            torch.save(model.state_dict(),options.weight_addr + str(timestamp) + "_epoch" +  str(epoch))
+            if epoch % 5 == 0:
+                print('Saving model!')
+                torch.save(model.state_dict(),options.weight_addr + str(timestamp) + "_epoch_" +  str(epoch) + "_score_" + str(test_score))
 
-    return test_accuracy
+    return test_score
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
@@ -142,5 +144,5 @@ if __name__ == '__main__':
 
     sampler = optuna.samplers.TPESampler()
     study = optuna.create_study(sampler=sampler, direction='maximize')
-    study.optimize(lambda trial: objective(trial, options), n_trials=100)
+    study.optimize(lambda trial: objective(trial, options), n_trials=20)
     joblib.dump(study, options.log_addr)
