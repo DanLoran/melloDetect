@@ -118,8 +118,11 @@ def basic_runner(parser):
                         help="Directory where all data is stored. Default:\
                         ./dataset/Data" )
     
-    parser.add_argument("--split", type=float, default=0.7,
-                        help="Split ratio. Default 0.7 (70% training)")
+    parser.add_argument("--split", type=float, default=0.8,
+                        help="Split ratio. Default 0.8 (80% training)")
+
+    parser.add_argument("--seed", type=float, default=123,
+                        help="Seed to be used for train/validate split randomness")
 
     parser.add_argument("--weight-addr", type=str, default="./weight/",
                         help="Directory where weight will be saved. Default: \

@@ -26,7 +26,7 @@ class SimpleDataset(Dataset):
 
 class Splitter:
     """Split datasets into train and validate on the fly"""
-    def __init__(self, labels_path, train_validate_ratio, transforms=None, seed = 123):
+    def __init__(self, labels_path, train_validate_ratio, seed, transforms=None):
         """
         Parameters
         ----------
