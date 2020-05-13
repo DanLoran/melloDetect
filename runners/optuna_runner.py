@@ -49,7 +49,7 @@ def train(model, loader, criterion, optimizer, epoch, options):
 def test(model, loader, options):
     with torch.no_grad():
         gt, pred = generate_results(loader, options, model)
-    score = eval_recall(gt,pred)
+    score = eval_recall(gt,pred) # remeber to change this to a parameter
     return score
 
 def objective(trial, options):
@@ -64,16 +64,22 @@ def objective(trial, options):
     '''
     Remember to comment out uneccessary hyperparameter that you are not tuning.
     Each hyperparameter also has a fixed value so that you can comment out the
-    optuna version without disrupting the flow
-    Available hyperparameters are:
+    optuna version without disrupting the flow. Option 1 is fixed value. Option
+    2 is autotune.
+
+    Available hyperparameters so far are:
         Final layers of model (model.<final layer name>)
         Learning rate (lr)
         Momentum (momentum)
         Optimizer (optimizer)
     '''
 
-    #----------------------------------------------------------------#
+    #------------------------------Final layers--------------------------------#
+
+    # Option 1:
     model = cmp.model_selection(options.arch)
+
+    # Option 2:
     num_layers = trial.suggest_int('num_layers',1,3)
     layer_list = []
     prev_num_neurons = 512
@@ -87,39 +93,50 @@ def objective(trial, options):
     layer_list.append(('output', nn.Softmax(dim=1)))
     fc = nn.Sequential(OrderedDict(layer_list))
     model.fc = fc
+
+    #--------------------------------------------------------------------------#
+
+    #-------------------------------Learning rate-------------------------------#
+    # Options 1:
+    lr = options.lr_fix
+
+    # Options 2:
+    lr = trial.suggest_loguniform('lr', options.lr_lower, options.lr_upper)
+    #--------------------------------------------------------------------------#
+
+    #-------------------------------Momentum-----------------------------------#
+    # Options 1:
+    momentum = options.momentum_fix
+
+    # Options 2:
+    momentum = trial.suggest_uniform('momentum', options.momentum_lower, options.momentum_upper)
+    #--------------------------------------------------------------------------#
+
+    #--------------------------------Optimizer---------------------------------#
+    optimizer_list = {'SGD': optim.SGD, 'RMSprop': optim.RMSprop, 'Adam': optim.Adam}
+
+    # Options 1:
+    optimizer = optimizer_list['Adam'](model.parameters(), lr=lr)
+
+    # Options 2:
+    optimizer_name = trial.suggest_categorical('optimizer',['SGD','RMSprop','Adam'])
+    if (optimizer_name == 'SGD' or optimizer_name = 'RMSprop'):
+        optimizer = optimizer_list[optimizer_name](model.parameters(), momentum=momentum, lr=lr)
+    elif (optimizer_name == 'Adam'):
+        optimizer = optimizer_list['Adam'](model.parameters(), lr=lr)
+    else:
+        print("Error: please check optimizer_list and optimizer_name")
+        exit(-1)
+    #--------------------------------------------------------------------------#
+
+################################################################################
+
     if (options.deploy_on_gpu):
         if (not torch.cuda.is_available()):
             print("GPU device doesn't exist")
         else:
             model = model.cuda()
             print("Deploying model on: " + torch.cuda.get_device_name(torch.cuda.current_device()) + "\n")
-    #----------------------------------------------------------------#
-
-    #----------------------------------------------------------------#
-    lr = 0.001
-    lr = trial.suggest_loguniform('lr', 1e-5, 1e-2)
-    #----------------------------------------------------------------#
-
-    #----------------------------------------------------------------#
-    momentum = 0.9
-    # momentum = trial.suggest_uniform('momentum', 0.4, 0.99)
-    #----------------------------------------------------------------#
-
-    #----------------------------------------------------------------#
-    optimizer_list = {'SGD': optim.SGD, 'RMSprop': optim.RMSprop, 'Adam': optim.Adam}
-    #optimizer_name = trial.suggest_categorical('optimizer',['SGD','RMSprop','Adam'])
-
-    optimizer = optimizer_list['Adam'](model.parameters(), lr=lr)
-    # if (optimizer_name == 'SGD' or optimizer_name = 'RMSprop'):
-    #     optimizer = optimizer_list[optimizer_name](model.parameters(), momentum=momentum, lr=lr)
-    # elif (optimizer_name == 'Adam'):
-    #     optimizer = optimizer_list['Adam'](model.parameters(), lr=lr)
-    # else:
-    #     print("Error: please check optimizer_list and optimizer_name")
-    #     exit(-1)
-    #----------------------------------------------------------------#
-
-################################################################################
 
     now = datetime.now()
     date = datetime.timestamp(now)
@@ -129,7 +146,7 @@ def objective(trial, options):
         test_score = test(model, test_loader, options)
 
         if options.checkpoint:
-            if epoch % 5 == 0:
+            if epoch % options.save_freq == 0:
                 print('Saving model!')
                 torch.save(model.state_dict(),options.weight_addr + str(timestamp) + "_epoch_" +  str(epoch) + "_score_" + str(test_score))
 
@@ -138,11 +155,10 @@ def objective(trial, options):
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     cmp.basic_runner(parser)
-    # optuna runner is like beefy runner ... but on steroid
-    cmp.beefy_runner(parser)
+    cmp.optuna_runner(parser)
     options = parser.parse_args()
 
     sampler = optuna.samplers.TPESampler()
-    study = optuna.create_study(sampler=sampler, direction='maximize')
-    study.optimize(lambda trial: objective(trial, options), n_trials=20)
+    study = optuna.create_study(sampler=sampler, direction=options.direction)
+    study.optimize(lambda trial: objective(trial, options), n_trials=options.num_trials)
     joblib.dump(study, options.log_addr)

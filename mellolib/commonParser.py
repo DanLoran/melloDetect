@@ -181,3 +181,45 @@ def eval_runner(parser):
 
     parser.add_argument("--arch", type = str, choices=ARCH,
                         help="Neural network architecture")
+
+def optuna_runner(parser):
+    parser.add_argument("--num-trials", type=int, default=20,
+                        help="Number of trials optuna should execute the runner \
+                        Default: 20" )
+
+    parser.add_argument("--lr-fix", type=float, default=0.001,
+                        help="Learning rate (if not part of autotuning). \
+                        Default: 0.001")
+
+    parser.add_argument("--lr-lower", type=float, default=0.000001,
+                        help="Lower bound of learning rate. \
+                        Default: 0.000001")
+
+    parser.add_argument("--lr-upper", type=float, default=0.001,
+                        help="Upper bound of learning rate. \
+                        Default: 0.001")
+
+    parser.add_argument("--momentum-fix", type=float, default=0.001,
+                        help="Momentum (if not part of autotuning). \
+                        Default: 0.99")
+
+    parser.add_argument("--momentum-lower", type=float, default=0.4,
+                        help="Lower bound of momentum. \
+                        Default: 0.4")
+
+    parser.add_argument("--momentum-upper", type=float, default=0.99,
+                        help="Upper bound of momentum. \
+                        Default: 0.99")
+
+    parser.add_argument("--eval-type", type= str, choices=EVAL,
+                        help="Evaluation type")
+
+    parser.add_argument("--batch-size", type=int, default=32,
+                        help="Batch size. Default: 32")
+
+    parser.add_argument("--direction", type=str, default="maximize",
+                        help="Autotune direction. Default: maximize")
+
+    parser.add_argument("--save-freq", type=int, default=5,
+                        help="Save weights every <--save-freq> epochs. \
+                        Default: 5")
