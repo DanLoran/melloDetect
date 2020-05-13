@@ -19,7 +19,7 @@ from mellolib import commonParser as cmp
 from mellolib.splitter import Splitter
 from mellolib.globalConstants import ARCH
 from mellolib.models import transfer
-from mellolib.eval import eval_auc, eval_accuracy, eval_f1, eval_precision, eval_recall, generate_results
+from mellolib.eval import eval_selection
 
 ############################ Setup parser ######################################
 parser = argparse.ArgumentParser()
@@ -133,31 +133,9 @@ try:
                 viz_itr+=1
 
             if (options.run_validation == True and (loop_itr % options.val_frequency == 0)):
-                gt, pred = generate_results(test_loader, options, model)
-                # evaluate the model
-                if options.eval_type == "AUC":
-                    eval_score.append(eval_auc(gt, pred))
-                    eval_name = "AUC Score "
-
-                elif options.eval_type == "ACCURACY":
-                    eval_score.append(eval_accuracy(gt, pred))
-                    eval_name = "Accuracy "
-
-                elif options.eval_type == "F1":
-                    eval_score.append(eval_f1(gt, pred))
-                    eval_name = "F1 Score "
-
-                elif options.eval_type == "PRECISION":
-                    eval_score.append(eval_precision(gt, pred))
-                    eval_name = "Precision Score "
-
-                elif options.eval_type == "RECALL":
-                    eval_score.append(eval_recall(gt, pred))
-                    eval_name = "Recall Score "
-
-                else:
-                    print("Error: evaluation not implemented!")
-                    exit(0)
+                score, name = eval_selection(test_loader, options, model)
+                eval_score.append(score)
+                eval_name = name
 
                 # show evaluation
                 if options.show_visdom:

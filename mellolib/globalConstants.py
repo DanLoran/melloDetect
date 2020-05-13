@@ -14,4 +14,4 @@ OPTIM = ['SGD','Adam']
 
 LOSS = ['BCE']
 
-EVAL = ['AUC','ACCURACY','F1', 'PRECISION', 'RECALL']
+EVAL = ['AUC','ACCURACY','F1', 'PRECISION', 'RECALL','TN','TP','FN','FP']

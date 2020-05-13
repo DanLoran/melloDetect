@@ -14,7 +14,7 @@ from torchvision.transforms import Scale
 from mellolib import commonParser as cmp
 from mellolib.globalConstants import ARCH
 from mellolib.models import transfer
-from mellolib.eval import eval_auc, eval_accuracy, eval_f1, eval_precision, eval_recall, generate_results
+from mellolib.eval import eval_auc, eval_accuracy, eval_f1, eval_precision, eval_recall, eval_confuse, generate_results
 
 ############################ Setup parser ######################################
 parser = argparse.ArgumentParser()
@@ -57,9 +57,14 @@ for weight_addr in weight_list:
     f1  = eval_f1(gt,pred)
     pre = eval_precision(gt,pred)
     rec = eval_recall(gt,pred)
+    tn, tp, fn, fp = eval_confuse(gt,pred)
 
     print("AUC: " + str(auc))
     print("ACC: " + str(acc))
     print("F1: "  + str(f1))
     print("PRE: " + str(pre))
     print("REC: " + str(rec))
+    print("TN: " + str(tn))
+    print("TP: " + str(tp))
+    print("FN: " + str(fn))
+    print("FP: " + str(fp))
