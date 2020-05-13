@@ -113,14 +113,16 @@ def basic_runner(parser):
     parser.add_argument("--run-at-checkpoint", type=boolean_string, default=True,
                         help="Resume training at checkpoint. Default:\
                         true")
+    
+    parser.add_argument("--data-addr", type=str, default="./dataset/Data",
+                        help="Directory where all data is stored. Default:\
+                        ./dataset/Data" )
+    
+    parser.add_argument("--split", type=float, default=0.8,
+                        help="Split ratio. Default 0.8 (80% training)")
 
-    parser.add_argument("--train-addr", type=str, default="./trainData/",
-                        help="Directory where train dataset is stored. Default:\
-                        ./trainData/" )
-
-    parser.add_argument("--val-addr", type=str, default="./valData/",
-                        help="Directory where validation dataset is stored. \
-                        Default:  ./valData/" )
+    parser.add_argument("--seed", type=float, default=123,
+                        help="Seed to be used for train/validate split randomness")
 
     parser.add_argument("--weight-addr", type=str, default="./weight/",
                         help="Directory where weight will be saved. Default: \

@@ -12,7 +12,6 @@ from torchvision.transforms import ToTensor
 from torchvision.transforms import Scale
 
 from mellolib import commonParser as cmp
-from mellolib.readData import MelloDataSet
 from mellolib.globalConstants import ARCH
 from mellolib.models import transfer
 from mellolib.eval import eval_auc, eval_accuracy, eval_f1, eval_precision, eval_recall, generate_results
@@ -25,7 +24,8 @@ options = parser.parse_args()
 ########################## Choose architecture #################################
 model = cmp.model_selection(options.arch)
 
-test_dataset = MelloDataSet(options.val_addr, transforms=Compose([Resize((256,256)), ToTensor()]))
+dataset_generator = Splitter(options.data_addr, options.split, options.seed, transforms=Compose([Resize((256,256)), ToTensor()]))
+test_dataset = dataset_generator.generate_validation_data()
 test_loader = torch.utils.data.DataLoader(test_dataset, batch_size=1)
 eval_score = []
 

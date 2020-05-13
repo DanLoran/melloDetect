@@ -16,7 +16,7 @@ import sys
 sys.path.append('../')
 
 from mellolib import commonParser as cmp
-from mellolib.readData import MelloDataSet
+from mellolib.splitter import Splitter
 from mellolib.globalConstants import ARCH
 from mellolib.models import transfer
 from mellolib.eval import eval_auc, eval_accuracy, eval_f1, eval_precision, eval_recall, generate_results
@@ -73,7 +73,8 @@ n_eps = options.epoch
 batch_size = options.batch_size
 optimizer = cmp.optimizer_selection(options.optimizer, model.parameters(), options.lr, options.momentum)
 criterion = cmp.criterion_selection(options.criterion)
-dataset = MelloDataSet(options.train_addr, transforms=Compose([Resize((256,256)), ToTensor()]))
+dataset_generator = Splitter(options.data_addr, options.split, options.seed, transforms=Compose([Resize((256,256)), ToTensor()]))
+dataset = dataset_generator.generate_training_data()
 loader = torch.utils.data.DataLoader(dataset, batch_size=batch_size, shuffle=options.shuffle)
 
 batch_n = 0
@@ -86,7 +87,7 @@ val_time = []
 
 # evaluation parameters
 if (options.run_validation):
-    test_dataset = MelloDataSet(options.val_addr, transforms=Compose([Resize((256,256)), ToTensor()]))
+    test_dataset = dataset_generator.generate_validation_data()
     test_loader = torch.utils.data.DataLoader(test_dataset, batch_size=1)
     eval_score = []
 
