@@ -223,3 +223,12 @@ def optuna_runner(parser):
     parser.add_argument("--save-freq", type=int, default=5,
                         help="Save weights every <--save-freq> epochs. \
                         Default: 5")
+
+    parser.add_argument("--epoch", type = int, default=1,
+                        help="Number of epochs. Default: 1")
+
+    parser.add_argument("--shuffle", type=boolean_string, default=True,
+                        help="Shuffle data during training. Default: true")
+
+    parser.add_argument("--criterion", type = str, choices=LOSS,
+                        help="Loss equations.")

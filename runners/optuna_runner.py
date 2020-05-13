@@ -15,7 +15,7 @@ from collections import OrderedDict
 import sys
 sys.path.append('../')
 
-from mellolib.eval import generate_results, eval_recall
+from mellolib.eval import generate_results, eval_auc
 from mellolib import commonParser as cmp
 from mellolib.readData import MelloDataSet
 from mellolib.globalConstants import ARCH
@@ -49,7 +49,7 @@ def train(model, loader, criterion, optimizer, epoch, options):
 def test(model, loader, options):
     with torch.no_grad():
         gt, pred = generate_results(loader, options, model)
-    score = eval_recall(gt,pred) # remeber to change this to a parameter
+    score = eval_auc(gt,pred) # remeber to change this to a parameter
     return score
 
 def objective(trial, options):
@@ -75,9 +75,9 @@ def objective(trial, options):
     '''
 
     #------------------------------Final layers--------------------------------#
-
-    # Option 1:
     model = cmp.model_selection(options.arch)
+    # Option 1:
+    # Nothing here
 
     # Option 2:
     num_layers = trial.suggest_int('num_layers',1,3)
@@ -98,7 +98,7 @@ def objective(trial, options):
 
     #-------------------------------Learning rate-------------------------------#
     # Options 1:
-    lr = options.lr_fix
+    # lr = options.lr_fix
 
     # Options 2:
     lr = trial.suggest_loguniform('lr', options.lr_lower, options.lr_upper)
@@ -109,7 +109,7 @@ def objective(trial, options):
     momentum = options.momentum_fix
 
     # Options 2:
-    momentum = trial.suggest_uniform('momentum', options.momentum_lower, options.momentum_upper)
+    # momentum = trial.suggest_uniform('momentum', options.momentum_lower, options.momentum_upper)
     #--------------------------------------------------------------------------#
 
     #--------------------------------Optimizer---------------------------------#
@@ -119,14 +119,14 @@ def objective(trial, options):
     optimizer = optimizer_list['Adam'](model.parameters(), lr=lr)
 
     # Options 2:
-    optimizer_name = trial.suggest_categorical('optimizer',['SGD','RMSprop','Adam'])
-    if (optimizer_name == 'SGD' or optimizer_name = 'RMSprop'):
-        optimizer = optimizer_list[optimizer_name](model.parameters(), momentum=momentum, lr=lr)
-    elif (optimizer_name == 'Adam'):
-        optimizer = optimizer_list['Adam'](model.parameters(), lr=lr)
-    else:
-        print("Error: please check optimizer_list and optimizer_name")
-        exit(-1)
+    # optimizer_name = trial.suggest_categorical('optimizer',['SGD','RMSprop','Adam'])
+    # if (optimizer_name == 'SGD' or optimizer_name == 'RMSprop'):
+    #     optimizer = optimizer_list[optimizer_name](model.parameters(), momentum=momentum, lr=lr)
+    # elif (optimizer_name == 'Adam'):
+    #     optimizer = optimizer_list['Adam'](model.parameters(), lr=lr)
+    # else:
+    #     print("Error: please check optimizer_list and optimizer_name")
+    #     exit(-1)
     #--------------------------------------------------------------------------#
 
 ################################################################################
