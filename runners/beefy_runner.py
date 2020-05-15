@@ -73,11 +73,7 @@ n_eps = options.epoch
 batch_size = options.batch_size
 optimizer = cmp.optimizer_selection(options.optimizer, model.parameters(), options.lr, options.momentum)
 criterion = cmp.criterion_selection(options.criterion)
-<<<<<<< HEAD
 dataset_generator = Splitter(options.data_addr, options.split, options.seed, transforms=Compose([Resize((256,256)), ToTensor()]))
-=======
-dataset_generator = Splitter(options.data_addr, options.split, transforms=Compose([Resize((256,256)), ToTensor()]))
->>>>>>> Splitter
 dataset = dataset_generator.generate_training_data()
 loader = torch.utils.data.DataLoader(dataset, batch_size=batch_size, shuffle=options.shuffle)
 
