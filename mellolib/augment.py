@@ -74,7 +74,7 @@ def noiser(num_images_total, noise_magnitude):
     return f
 
 def identity():
-    def f(image):
+    def f(image, _):
         return image
     f.num = 1
     return f

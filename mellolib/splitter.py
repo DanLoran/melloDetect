@@ -21,10 +21,12 @@ class SimpleDataset(Dataset):
 
     def __getitem__(self, index):
         # TODO(sam): make this resizing cleaner. Maybe add in pre-transforms?
-        image = Image.open(self.data[floor(index / self.num_augmentations)][0]).resize([256, 256])
+        base_index = floor(index / self.num_augmentations)
+        augmentation_index = index % self.num_augmentations
+
+        image = Image.open(self.data[base_index][0]).resize([256, 256])
 
         # pick the augmentation to apply
-        augmentation_index = index % self.num_augmentations
         for augmentation in self.augmentations:
             if augmentation_index < augmentation.num:
                 image = augmentation(image, augmentation_index)
@@ -33,7 +35,7 @@ class SimpleDataset(Dataset):
         if self.transforms is not None:
             image = self.transforms(image)
 
-        return image.type(torch.float), torch.FloatTensor(self.data[index][1])
+        return image.type(torch.float), torch.FloatTensor(self.data[base_index][1])
 
     def __len__(self):
         return len(self.data) * self.num_augmentations
@@ -44,10 +46,11 @@ class Splitter:
     Splitter will:
     1) Read all datapoints at labels_path
     2) Shuffle the datapoints
-    3) Chop the datapoints so there is an equal number in each class
-    4) Apply transformations
-    5) Apply augmentations
-    6) Return images
+    3) Chop the datapoints so there is an equal number in each class (max num_images)
+    4) Return a SimpleDataset which will:
+        a) Apply transformations
+        b) Apply augmentations
+        c) Return images
     """
     def __init__(self,
                  labels_path,
@@ -72,9 +75,11 @@ class Splitter:
             Total number of unique images to read. None means return all.
             (note that the total number of images returned = num_images * # of augmentation outputs
             per image)
-        augmentations : [(function, int)]
+        augmentations : [(augmentation_function)]
             Augmentations used to expand the number of images returned. function is a function that
-            takes an image and yields some number of augmented images.
+            takes an image and has a "num" property which desribes how many images it will return,
+            and yields some number of augmented images.
+            e.g. argument: [augment.mirrorer(), white_balancer([1900, 15000])]
         """
         random.seed(seed)
         self.transforms = transforms
