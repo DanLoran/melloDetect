@@ -19,10 +19,6 @@ import numpy as np
 from visdom import Visdom
 from torch.optim import SGD, Adam
 from torch.nn import BCELoss
-from torchvision.transforms import Compose
-from torchvision.transforms import Resize
-from torchvision.transforms import ToTensor
-from torchvision.transforms import Scale
 from tqdm import tqdm
 from datetime import datetime
 import sys
@@ -86,7 +82,7 @@ batch_size = 32
 lr = 0.001
 optimizer = Adam(model.parameters(), lr=lr)
 criterion = BCELoss()
-dataset_generator = Splitter(options.data_addr, options.split, options.seed, transforms=Compose([Resize((256,256)), ToTensor()]))
+dataset_generator = Splitter(options.data_addr, options.split, options.seed)
 dataset = dataset_generator.generate_training_data()
 loader = torch.utils.data.DataLoader(dataset, batch_size=batch_size, shuffle=True)
 batch_n = 0
