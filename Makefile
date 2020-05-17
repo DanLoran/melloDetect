@@ -1,4 +1,4 @@
-.PHONY: all
+.PHONY: all test
 
 all: docker exec
 
@@ -20,3 +20,6 @@ run:
 
 stop:
 	docker stop mello
+
+test:
+	python3 -m pytest
