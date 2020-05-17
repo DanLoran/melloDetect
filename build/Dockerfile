@@ -14,3 +14,5 @@ RUN pip3 install \
 	tqdm==4.45.0
 
 RUN apt-get install -y git
+
+RUN pip3 install -U pytest
