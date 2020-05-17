@@ -15,4 +15,6 @@ RUN pip3 install \
 
 RUN apt-get install -y git
 
-RUN pip3 install -U pytest
+RUN pip3 install \
+	pytest \
+  matplotlib
