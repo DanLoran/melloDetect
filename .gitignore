@@ -4,5 +4,6 @@ test/__pycache__
 mellolib/__pycache__
 mellolib/models/__pycache__
 dataset/__pycache__
+__pycache__
 logs/
 *.jpeg
