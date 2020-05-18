@@ -1,7 +1,7 @@
 import torch
 import argparse
 import numpy as np
-
+import time as t
 from visdom import Visdom
 from torch.optim import SGD, Adam
 from torch.nn import BCELoss
@@ -67,14 +67,20 @@ log = open(options.log_addr,"w+")
 
 # Basic runner stuff
 cmp.DEBUGprint("Initialize runner. \n", options.debug)
-
+cmp.DEBUGprint("Dataloader optimization level " + str(options.load_level) + "\n", options.debug)
 ########################## Training setup ######################################
 n_eps = options.epoch
 batch_size = options.batch_size
 optimizer = cmp.optimizer_selection(options.optimizer, model.parameters(), options.lr, options.momentum)
 criterion = cmp.criterion_selection(options.criterion)
-dataset_generator = Splitter(options.data_addr, options.split, options.seed, transforms=Compose([Resize((256,256)), ToTensor()]))
+dataset_generator = Splitter(options.data_addr,
+                             options.split,
+                             options.seed,
+                             transforms=Compose([Resize((256,256)), ToTensor()]),
+                             opt=options.load_level,
+                             gpu=options.deploy_on_gpu)
 dataset = dataset_generator.generate_training_data()
+
 loader = torch.utils.data.DataLoader(dataset, batch_size=batch_size, shuffle=options.shuffle)
 
 batch_n = 0
@@ -106,12 +112,14 @@ print("Start training at ", timestamp)
 model.train()
 
 try:
+    start = t.perf_counter()
     for ep in tqdm(range(n_eps)):
         for inp, target in loader:
             loop_itr += 1
             if options.deploy_on_gpu:
                 target = torch.autograd.Variable(target).cuda()
-                inp = torch.autograd.Variable(inp).cuda()
+                if (options.load_level == 0):
+                    inp = torch.autograd.Variable(inp).cuda()
             else:
                 target = torch.autograd.Variable(target)
                 inp = torch.autograd.Variable(inp)
@@ -157,6 +165,8 @@ try:
                 save_name = options.weight_addr
             torch.save(model.state_dict(),save_name + str(timestamp) + "_epoch" +  str(ep))
     log.close()
+    end = t.perf_counter()
+    print("Elapse time: " + str(end - start) + " seconds")
 except KeyboardInterrupt:
     if (options.save_if_interupt):
         print("User interupt, runner will save and gracefully exit now")

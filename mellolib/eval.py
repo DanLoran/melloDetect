@@ -57,9 +57,10 @@ def generate_results(test_loader, options, model):
 
     for inp, target in test_loader:
 
-        if (options.deploy_on_gpu):
+        if options.deploy_on_gpu:
             target = torch.autograd.Variable(target).cuda()
-            inp = torch.autograd.Variable(inp).cuda()
+            if (options.load_level == 0):
+                inp = torch.autograd.Variable(inp).cuda()
         else:
             target = torch.autograd.Variable(target)
             inp = torch.autograd.Variable(inp)

@@ -24,7 +24,12 @@ options = parser.parse_args()
 ########################## Choose architecture #################################
 model = cmp.model_selection(options.arch)
 
-dataset_generator = Splitter(options.data_addr, options.split, options.seed, transforms=Compose([Resize((256,256)), ToTensor()]))
+dataset_generator = Splitter(options.data_addr,
+                             options.split,
+                             options.seed,
+                             transforms=Compose([Resize((256,256)), ToTensor()]),
+                             opt=options.load_level,
+                             gpu=options.deploy_on_gpu)
 test_dataset = dataset_generator.generate_validation_data()
 test_loader = torch.utils.data.DataLoader(test_dataset, batch_size=1)
 eval_score = []

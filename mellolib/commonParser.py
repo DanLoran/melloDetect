@@ -113,11 +113,11 @@ def basic_runner(parser):
     parser.add_argument("--run-at-checkpoint", type=boolean_string, default=True,
                         help="Resume training at checkpoint. Default:\
                         true")
-    
+
     parser.add_argument("--data-addr", type=str, default="./dataset/Data",
                         help="Directory where all data is stored. Default:\
                         ./dataset/Data" )
-    
+
     parser.add_argument("--split", type=float, default=0.8,
                         help="Split ratio. Default 0.8 (80% training)")
 
@@ -134,6 +134,9 @@ def basic_runner(parser):
 
     parser.add_argument("--arch", type = str, choices=ARCH,
                         help="Neural network architecture")
+
+    parser.add_argument("--load-level", type = int, choices=[0,1,2], default = 0,
+                        help="Data loader optimization level, Default: 0")
 
 def beefy_runner(parser):
     parser.add_argument("--optimizer", type = str, choices=OPTIM,
