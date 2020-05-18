@@ -149,7 +149,7 @@ class Splitter:
         data = []
         with open(os.path.join(labels_path, "label.csv"), "r") as f:
             for row in csv.reader(f):
-                image_path = os.path.join(labels_path, row[0])
+                image_path = os.path.join(labels_path, row[0] + ".jpeg")
 
                 # Convert to onehot. If label equals i set 1, else set 0.
                 label_value = int(row[3])
