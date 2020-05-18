@@ -6,45 +6,86 @@ from PIL import Image
 from mellolib.globalConstants import FIELDS
 from torch.utils.data import Dataset
 import torch
+import h5py
 
-class SimpleDataset(Dataset):
+class L0Dataset(Dataset):
     # Data is a list of the form [('path', [label]), ...]
-    def __init__(self, data, transforms, opt, gpu):
+    def __init__(self, data, transforms):
         self.data = data
         self.transforms = transforms
-        self.opt = opt
+
+    def __getitem__(self, index):
+        image = Image.open(self.data[index][0])
+
+        if (self.transforms is not None):
+            image = self.transforms(image)
+
+        return image.type(torch.float), torch.FloatTensor(self.data[index][1])
+
+    def __len__(self):
+        return len(self.data)
+
+class L1Dataset(Dataset):
+    # Data is a list of the form [('path', [label]), ...]
+    def __init__(self, data, transforms, gpu):
+        self.data = data
+        self.transforms = transforms
         self.gpu = gpu
 
         # Preprocessing before optimization level 1 or 2
         path = self.data[0][0].split('/')
         path = '/'.join(path[0:-1]) + '/'
 
-        if (self.transforms is None and self.opt > 0):
+        if (self.transforms is None):
             print("Error: Optimization level > 0 needs pre-training transformation")
             exit(-1)
 
-        if (self.opt == 1):
-            for index in range(len(self.data)):
-                image = Image.open(self.data[index][0])
-                image = self.transforms(image)
-                torch.save(image.type(torch.float), path + str(index) + '.pt')
-                self.data[index] = (path + str(index) + '.pt', self.data[index][1])
+        for index in range(len(self.data)):
+            image = Image.open(self.data[index][0])
+            image = self.transforms(image)
+            torch.save(image.type(torch.float), path + str(index) + '.pt')
+            self.data[index] = (path + str(index) + '.pt', self.data[index][1])
 
     def __getitem__(self, index):
 
-        if (self.opt == 0):
-            image = Image.open(self.data[index][0])
-        elif (self.opt == 1 and self.gpu):
+        if (self.gpu):
             image = torch.load(self.data[index][0], map_location=lambda storage, loc: storage.cuda(0))
-        elif (self.opt == 1 and not self.gpu):
+        else:
             image = torch.load(self.data[index][0])
 
-
-        if (self.transforms is not None and self.opt == 0):
-            image = self.transforms(image)
-            image = image.type(torch.float)
-
         return image, torch.FloatTensor(self.data[index][1])
+
+    def __len__(self):
+        return len(self.data)
+
+class L2Dataset(Dataset):
+    # Data is a list of the form [('path', [label]), ...]
+    def __init__(self, data, transforms):
+        self.data = data
+        self.transforms = transforms
+        path = self.data[0][0].split('/')
+        path = '/'.join(path[0:-1]) + '/'
+        os.system('rm -rf ' + path+'/database.h5')
+        self.database = h5py.File(path+'/database.h5','a')
+        self.image_group = self.database.create_group('images')
+        self.label_group = self.database.create_group('labels')
+
+        if (self.transforms is None):
+            print("Error: Optimization level > 0 needs pre-training transformation")
+            exit(-1)
+
+        for index in range(len(self.data)):
+            image = Image.open(self.data[index][0])
+            image = np.asarray(self.transforms(image))
+            label = np.asarray(self.data[index][1])
+            self.image_group.create_dataset(str(index), data=image, dtype="f")
+            self.label_group.create_dataset(str(index), data=label, dtype="f")
+
+    def __getitem__(self, index):
+        image = torch.from_numpy(np.asarray(self.image_group.get(str(index))))
+        label = torch.from_numpy(np.asarray(self.label_group.get(str(index))))
+
+        return image, label
 
     def __len__(self):
         return len(self.data)
@@ -118,7 +159,17 @@ class Splitter:
         return data
 
     def generate_training_data(self):
-        return SimpleDataset([self.data[i] for i in self.split_indexes[0][0] + self.split_indexes[1][0]], self.transforms, self.opt, self.gpu)
+        if (self.opt == 0):
+            return L0Dataset([self.data[i] for i in self.split_indexes[0][0] + self.split_indexes[1][0]], self.transforms)
+        elif (self.opt == 1):
+            return L1Dataset([self.data[i] for i in self.split_indexes[0][0] + self.split_indexes[1][0]], self.transforms, self.gpu)
+        elif (self.opt == 2):
+            return L2Dataset([self.data[i] for i in self.split_indexes[0][0] + self.split_indexes[1][0]], self.transforms)
 
     def generate_validation_data(self):
-        return SimpleDataset([self.data[i] for i in self.split_indexes[0][1] + self.split_indexes[1][1]], self.transforms, self.opt, self.gpu)
+        if (self.opt == 0):
+            return L0Dataset([self.data[i] for i in self.split_indexes[0][1] + self.split_indexes[1][1]], self.transforms)
+        elif (self.opt == 1):
+            return L1Dataset([self.data[i] for i in self.split_indexes[0][1] + self.split_indexes[1][1]], self.transforms, self.gpu)
+        elif (self.opt == 0):
+            return L2Dataset([self.data[i] for i in self.split_indexes[0][1] + self.split_indexes[1][1]], self.transforms)

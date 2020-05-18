@@ -118,7 +118,7 @@ try:
             loop_itr += 1
             if options.deploy_on_gpu:
                 target = torch.autograd.Variable(target).cuda()
-                if (options.load_level == 0):
+                if (not (options.load_level == 1)):
                     inp = torch.autograd.Variable(inp).cuda()
             else:
                 target = torch.autograd.Variable(target)
