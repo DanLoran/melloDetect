@@ -67,23 +67,74 @@ class L2Dataset(Dataset):
         path = '/'.join(path[0:-1]) + '/'
         os.system('rm -rf ' + path+'/database.h5')
         self.database = h5py.File(path+'/database.h5','a')
-        self.image_group = self.database.create_group('images')
-        self.label_group = self.database.create_group('labels')
+        self.prefetch_image = self.database.create_group('image')
+        self.prefetch_label = self.database.create_group('label')
+
+        self.cur_images = []
+        self.cur_labels = []
+
+        # These are just heuristic
+        self.prefetch_head = 0
+        self.max_miss_percentage = 0.01
+        self.miss_count = 0
+        self.prefetch_length = 256
 
         if (self.transforms is None):
             print("Error: Optimization level > 0 needs pre-training transformation")
             exit(-1)
 
-        for index in range(len(self.data)):
+        count = 0
+        array_name = 0
+        for index in range(len(self.data) - (len(self.data) % self.prefetch_length) + 1):
+            if(count == self.prefetch_length):
+                print("Creating prefetch array " + str(array_name))
+                self.prefetch_image.create_dataset(str(array_name), data=self.cur_images,compression="gzip")
+                self.prefetch_label.create_dataset(str(array_name), data=self.cur_labels,compression="gzip")
+                array_name += 1
+                count = 0
+                self.cur_images = []
+                self.cur_labels = []
+
             image = Image.open(self.data[index][0])
-            image = np.asarray(self.transforms(image))
-            label = np.asarray(self.data[index][1])
-            self.image_group.create_dataset(str(index), data=image, dtype="f")
-            self.label_group.create_dataset(str(index), data=label, dtype="f")
+            image = np.asarray(self.transforms(image), dtype=np.int8)
+            label = np.asarray(self.data[index][1], dtype=np.int8)
+            self.cur_images.append(image)
+            self.cur_labels.append(label)
+            count += 1
+
+        self.cur_images = torch.from_numpy(np.asarray(self.prefetch_image.get('0'))).type(torch.float)
+        self.cur_labels = torch.from_numpy(np.asarray(self.prefetch_label.get('0'))).type(torch.float)
 
     def __getitem__(self, index):
-        image = torch.from_numpy(np.asarray(self.image_group.get(str(index))))
-        label = torch.from_numpy(np.asarray(self.label_group.get(str(index))))
+
+        if (index >= len(self.data) - (len(self.data) % self.prefetch_length)):
+            return self.cur_images[0],  self.cur_labels[0]
+
+        local_idx = index % self.prefetch_length
+        # Read hit
+        if (self.prefetch_head <= index and index < self.prefetch_head + self.prefetch_length):
+            image = self.cur_images[local_idx]
+            label = self.cur_labels[local_idx]
+
+        # Read miss
+        else:
+            # Tolerate miss
+            if (self.miss_count < int(self.prefetch_length * self.max_miss_percentage)):
+                self.miss_count += 1
+                array_name = int(index/self.prefetch_length)
+                temp_image = torch.from_numpy(np.asarray(self.prefetch_image.get(str(array_name)))).type(torch.float)
+                temp_label = torch.from_numpy(np.asarray(self.prefetch_label.get(str(array_name)))).type(torch.float)
+                image = temp_image[local_idx]
+                label = temp_label[local_idx]
+            # Reload miss
+            else:
+                self.miss_count = 0
+                array_name = int(index/self.prefetch_length)
+                self.cur_images = torch.from_numpy(np.asarray(self.prefetch_image.get(str(array_name)))).type(torch.float)
+                self.cur_labels = torch.from_numpy(np.asarray(self.prefetch_label.get(str(array_name)))).type(torch.float)
+                self.prefetch_head = array_name * self.prefetch_length
+                image = self.cur_images[local_idx]
+                label = self.cur_labels[local_idx]
 
         return image, label
 
