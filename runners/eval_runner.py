@@ -1,7 +1,7 @@
 import torch
 import argparse
 import numpy as np
-from os import listdir
+from os import listdir, path
 from os.path import isfile, join
 import sys
 sys.path.append('../')
@@ -11,6 +11,7 @@ from torchvision.transforms import Resize
 from torchvision.transforms import ToTensor
 from torchvision.transforms import Scale
 
+from mellolib.splitter import Splitter
 from mellolib import commonParser as cmp
 from mellolib.globalConstants import ARCH
 from mellolib.models import transfer
@@ -49,7 +50,12 @@ for weight_addr in weight_list:
     print("For " + weight_addr)
     print("+"*60)
 
-    model.load_state_dict(torch.load(options.eval_weight_addr + weight_addr))
+    weightFileName = path.join(options.eval_weight_addr, weight_addr)
+
+    if options.deploy_on_gpu:
+        model.load_state_dict(torch.load(weightFileName))
+    else:
+        model.load_state_dict(torch.load(weightFileName, map_location=torch.device('cpu')))
     gt, pred = generate_results(test_loader, options, model)
 
     auc = eval_auc(gt,pred)
