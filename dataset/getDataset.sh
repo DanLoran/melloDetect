@@ -28,3 +28,5 @@ python3 ./ISIC-Archive-Downloader/download_archive.py --images-dir ./Data/Images
 python3 ./ISIC-Archive-Downloader/download_archive.py --images-dir ./Data/Images --descs-dir ./Data/Descriptions --filter benign --p $num_proc --q 1
 
 python3 makecsv.py
+
+python3 shrink.py
