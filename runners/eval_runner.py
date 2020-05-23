@@ -1,7 +1,7 @@
 import torch
 import argparse
 import numpy as np
-from os import listdir
+from os import listdir, path
 from os.path import isfile, join
 import sys
 sys.path.append('../')
@@ -50,10 +50,12 @@ for weight_addr in weight_list:
     print("For " + weight_addr)
     print("+"*60)
 
+    weightFileName = path.join(options.eval_weight_addr, weight_addr)
+
     if options.deploy_on_gpu:
-        model.load_state_dict(torch.load(options.eval_weight_addr + weight_addr))
+        model.load_state_dict(torch.load(weightFileName))
     else:
-        model.load_state_dict(torch.load(options.eval_weight_addr + weight_addr, map_location=torch.device('cpu')))
+        model.load_state_dict(torch.load(weightFileName, map_location=torch.device('cpu')))
     gt, pred = generate_results(test_loader, options, model)
 
     auc = eval_auc(gt,pred)
