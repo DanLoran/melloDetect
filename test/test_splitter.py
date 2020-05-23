@@ -1,42 +1,61 @@
 import os
 from PIL import Image
 from mellolib.splitter import Splitter
+from mellolib.augment import white_balancer
+from pathlib import Path
+from PIL import ImageChops
+from shutil import copyfile
+import torch
 
-def create_fake_data(fs, path):
+test_file_path = "test/test.jpg"
+
+def create_fake_data(fs):
+    path = '/test/'
+    Path(path).mkdir(parents=True, exist_ok=True)
     label_path = path + "label.csv"
     num_neg_images = 6
     num_pos_images = 6
 
-    fs.create_file(label_path)
-    with open(label_path, "w") as f:
+    with open(label_path, "w+") as f:
         for num in range(num_neg_images):
             f.write("ISIC_000000" + str(num) + ",30,0,0\n")
         for num in range(num_neg_images, num_neg_images + num_pos_images):
             f.write("ISIC_000000" + str(num) + ",30,0,1\n")
     
+    # copy the test image to these locations
+    fs.add_real_file(test_file_path)
     for num in range(num_neg_images):
         image_path = path + "ISIC_000000" + str(num) + ".jpeg"
-        fs.create_file(image_path)
-        Image.new('RGB', size=(50, 50), color=(0, 255, 0)).save(image_path)
+        copyfile(test_file_path, image_path)
 
     for num in range(num_neg_images, num_neg_images + num_pos_images):
         image_path = path + "ISIC_000000" + str(num) + ".jpeg"
-        fs.create_file(image_path)
-        Image.new('RGB', size=(50, 50), color=(0, 255, 0)).save(image_path)
+        copyfile(test_file_path, image_path)
 
-
-def test_my_fakefs_test(fs):
-    # "fs" is the reference to the fake file system
-    # This tests just ensures the fakefs works.
-    fs.create_file('/var/data/xx1.txt')
-    assert os.path.exists('/var/data/xx1.txt')
+    return path
 
 def test_basic_splitter(fs):
-    data_path = '/test/'
-
-    create_fake_data(fs, data_path)
-
-    splitter = Splitter(data_path, 0.5, 123)
+    splitter = Splitter(create_fake_data(fs), 0.5, 123)
 
     assert len(splitter.generate_training_data()) == 6
     assert len(splitter.generate_validation_data()) == 6
+
+    # check we can read the image
+    splitter.generate_training_data()[0]
+
+
+def test_capped_images(fs):
+    splitter = Splitter(create_fake_data(fs), 0.5, 123, num_images=2)
+
+    assert len(splitter.generate_training_data()) == 2
+    assert len(splitter.generate_validation_data()) == 2
+
+def test_augmented_images(fs):
+    splitter = Splitter(create_fake_data(fs), 0.5, 123, num_images=2, augmentations=[white_balancer([1900])])
+
+    assert len(splitter.generate_training_data()) == 4
+    assert len(splitter.generate_validation_data()) == 4
+
+    # Check we have actually modified the pixel values
+    dataset = splitter.generate_training_data()
+    assert not torch.all(torch.eq(dataset[0][0], dataset[1][0]))

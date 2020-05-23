@@ -31,7 +31,7 @@ class SimpleDataset(Dataset):
                 image = augmentation(image, augmentation_index)
             augmentation_index -= augmentation.num
 
-        return ToTensor(image.type(torch.float)), torch.FloatTensor(self.data[base_index][1])
+        return ToTensor()(image).type(torch.float), torch.FloatTensor(self.data[base_index][1])
 
     def __len__(self):
         return len(self.data) * self.num_augmentations
