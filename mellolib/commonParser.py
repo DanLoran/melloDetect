@@ -113,11 +113,11 @@ def basic_runner(parser):
     parser.add_argument("--run-at-checkpoint", type=boolean_string, default=True,
                         help="Resume training at checkpoint. Default:\
                         true")
-    
+
     parser.add_argument("--data-addr", type=str, default="./dataset/Data",
                         help="Directory where all data is stored. Default:\
                         ./dataset/Data" )
-    
+
     parser.add_argument("--split", type=float, default=0.8,
                         help="Split ratio. Default 0.8 (80% training)")
 
@@ -177,9 +177,66 @@ def eval_runner(parser):
                         help="Directory where all weight will be evaluated. Default: \
                         ./weight/")
 
-    parser.add_argument("--val-addr", type=str, default="./valData/",
+    parser.add_argument("--split", type=float, default=0.8,
+                       help="Split ratio. Default 0.8 (80% training)")
+
+    parser.add_argument("--seed", type=float, default=123,
+                       help="Seed to be used for train/validate split randomness")
+
+    parser.add_argument("--data-addr", type=str, default="./valData/",
                         help="Directory where validation dataset is stored. \
                         Default:  ./valData/" )
 
     parser.add_argument("--arch", type = str, choices=ARCH,
                         help="Neural network architecture")
+
+def optuna_runner(parser):
+    parser.add_argument("--num-trials", type=int, default=20,
+                        help="Number of trials optuna should execute the runner \
+                        Default: 20" )
+
+    parser.add_argument("--lr-fix", type=float, default=0.001,
+                        help="Learning rate (if not part of autotuning). \
+                        Default: 0.001")
+
+    parser.add_argument("--lr-lower", type=float, default=0.000001,
+                        help="Lower bound of learning rate. \
+                        Default: 0.000001")
+
+    parser.add_argument("--lr-upper", type=float, default=0.001,
+                        help="Upper bound of learning rate. \
+                        Default: 0.001")
+
+    parser.add_argument("--momentum-fix", type=float, default=0.001,
+                        help="Momentum (if not part of autotuning). \
+                        Default: 0.99")
+
+    parser.add_argument("--momentum-lower", type=float, default=0.4,
+                        help="Lower bound of momentum. \
+                        Default: 0.4")
+
+    parser.add_argument("--momentum-upper", type=float, default=0.99,
+                        help="Upper bound of momentum. \
+                        Default: 0.99")
+
+    parser.add_argument("--eval-type", type= str, choices=EVAL,
+                        help="Evaluation type")
+
+    parser.add_argument("--batch-size", type=int, default=32,
+                        help="Batch size. Default: 32")
+
+    parser.add_argument("--direction", type=str, default="maximize",
+                        help="Autotune direction. Default: maximize")
+
+    parser.add_argument("--save-freq", type=int, default=5,
+                        help="Save weights every <--save-freq> epochs. \
+                        Default: 5")
+
+    parser.add_argument("--epoch", type = int, default=1,
+                        help="Number of epochs. Default: 1")
+
+    parser.add_argument("--shuffle", type=boolean_string, default=True,
+                        help="Shuffle data during training. Default: true")
+
+    parser.add_argument("--criterion", type = str, choices=LOSS,
+                        help="Loss equations.")
