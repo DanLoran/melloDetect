@@ -5,7 +5,7 @@ import numpy as np
 def rotator(num_images_total):
     def f(image, i):
         rotation_amount = 360 / num_images_total
-        image.rotate(rotation_amount * i)
+        return image.rotate(rotation_amount * i)
     f.num = num_images_total
     return f
 
@@ -50,7 +50,7 @@ def white_balancer(temps):
                 [image_data[:, :, 0] * channel_offsets[0],
                  image_data[:, :, 1] * channel_offsets[1],
                  image_data[:, :, 2] * channel_offsets[2]]).clip(0, 255).astype(np.uint8), 0, 2)
-        Image.fromarray(transformed_image_data)
+        return Image.fromarray(transformed_image_data)
     f.num = len(temps)
     return f
 
