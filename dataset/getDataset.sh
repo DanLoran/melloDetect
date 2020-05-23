@@ -28,10 +28,3 @@ python3 ./ISIC-Archive-Downloader/download_archive.py --images-dir ./Data/Images
 python3 ./ISIC-Archive-Downloader/download_archive.py --images-dir ./Data/Images --descs-dir ./Data/Descriptions --filter benign --p $num_proc --q 1
 
 python3 makecsv.py
-
-read -p "How much of the data in percentage do you want to reserve for validation? (0 to 100): " partition
-
-mkdir ValData
-mkdir TrainData
-
-python3 makepartition.py --p partition --source-addr ./Data/Images --val-addr ./ValData --train-addr ./TrainData
