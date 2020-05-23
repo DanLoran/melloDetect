@@ -54,9 +54,9 @@ def test(model, loader, options):
 
 def objective(trial, options):
     train_dataset = MelloDataSet(options.train_addr, transforms=Compose([Resize((256,256)), ToTensor()]))
-    train_loader = torch.utils.data.DataLoader(train_dataset, batch_size=options.batch_size, shuffle=options.shuffle)
+    train_loader = torch.utils.data.DataLoader(train_dataset, batch_size=options.batch_size, shuffle=options.shuffle, num_workers=6, pin_memory=True)
     test_dataset = MelloDataSet(options.val_addr, transforms=Compose([Resize((256,256)), ToTensor()]))
-    test_loader = torch.utils.data.DataLoader(test_dataset, batch_size=1)
+    test_loader = torch.utils.data.DataLoader(test_dataset, batch_size=1, num_workers=6, pin_memory=True)
 
     criterion = cmp.criterion_selection(options.criterion)
 

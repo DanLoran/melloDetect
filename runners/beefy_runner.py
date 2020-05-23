@@ -71,7 +71,7 @@ optimizer = cmp.optimizer_selection(options.optimizer, model.parameters(), optio
 criterion = cmp.criterion_selection(options.criterion)
 dataset_generator = Splitter(options.data_addr, options.split, options.seed)
 dataset = dataset_generator.generate_training_data()
-loader = torch.utils.data.DataLoader(dataset, batch_size=batch_size, shuffle=options.shuffle)
+loader = torch.utils.data.DataLoader(dataset, batch_size=batch_size, shuffle=options.shuffle, num_workers=6, pin_memory=True)
 
 batch_n = 0
 loop_itr = 0
@@ -84,7 +84,7 @@ val_time = []
 # evaluation parameters
 if (options.run_validation):
     test_dataset = dataset_generator.generate_validation_data()
-    test_loader = torch.utils.data.DataLoader(test_dataset, batch_size=1)
+    test_loader = torch.utils.data.DataLoader(test_dataset, batch_size=1, num_workers=6, pin_memory=True)
     eval_score = []
 
 cmp.DEBUGprint("Training... \n", options.debug)
