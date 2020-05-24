@@ -7,6 +7,8 @@ def read_shrink_write(path):
         Image.open(path + ".jpeg").resize([256,256]).save(path + "_small.jpeg")
     if os.path.isfile(path + ".png"):
         Image.open(path + ".png").convert("RGB").resize([256,256]).save(path + "_small.jpeg")
+    if os.path.isfile(path + ".jpg"):
+        Image.open(path + ".jpg").resize([256,256]).save(path + "_small.jpeg")
 
 if __name__ == "__main__":
     with open("Data/Images/label.csv", "r") as f:
