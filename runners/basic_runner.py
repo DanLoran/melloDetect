@@ -84,7 +84,7 @@ optimizer = Adam(model.parameters(), lr=lr)
 criterion = BCELoss()
 dataset_generator = Splitter(options.data_addr, options.split, options.seed)
 dataset = dataset_generator.generate_training_data()
-loader = torch.utils.data.DataLoader(dataset, batch_size=batch_size, shuffle=True)
+loader = torch.utils.data.DataLoader(dataset, batch_size=batch_size, shuffle=True, num_workers=6, pin_memory=True)
 batch_n = 0
 itr = 0
 losses = []
@@ -93,7 +93,7 @@ time = []
 # evaluation parameters
 if (options.run_validation):
     test_dataset = dataset_generator.generate_validation_data()
-    test_loader = torch.utils.data.DataLoader(test_dataset, batch_size=batch_size)
+    test_loader = torch.utils.data.DataLoader(test_dataset, batch_size=batch_size, num_workers=6, pin_memory=True)
     eval_score = []
 
 cmp.DEBUGprint("Training... \n", options.debug)
