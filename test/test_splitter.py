@@ -25,11 +25,11 @@ def create_fake_data(fs):
     # copy the test image to these locations
     fs.add_real_file(test_file_path)
     for num in range(num_neg_images):
-        image_path = path + "ISIC_000000" + str(num) + ".jpeg"
+        image_path = path + "ISIC_000000" + str(num) + "_small.jpeg"
         copyfile(test_file_path, image_path)
 
     for num in range(num_neg_images, num_neg_images + num_pos_images):
-        image_path = path + "ISIC_000000" + str(num) + ".jpeg"
+        image_path = path + "ISIC_000000" + str(num) + "_small.jpeg"
         copyfile(test_file_path, image_path)
 
     return path
