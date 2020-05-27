@@ -22,14 +22,14 @@ model.load_state_dict(torch.load('../weight/'))
 model.eval()
 ############################## Inference Setup #################################
 
-def transform_image(image_bytes):
+def transform_image(img):
     my_transforms = transforms.Compose([transforms.Resize(256),transforms.ToTensor()])
-    image = Image.open(io.BytesIO(image_bytes))
-    return my_transforms(image)
+    img = Image.open(io.BytesIO(img))
+    return my_transforms(img)
 
 
-def get_prediction(image_bytes):
-    tensor = transform_image(image_bytes=image_bytes)
+def get_prediction(img):
+    tensor = transform_image(img)
     outputs = model.forward(tensor)
     return outputs
 
@@ -37,9 +37,9 @@ def get_prediction(image_bytes):
 @app.route('/predict', methods=['POST'])
 def predict():
     if request.method == 'POST':
-        file = request.files['file']
-        img_bytes = file.read()
-        benign, malignant = get_prediction(image_bytes=img_bytes)
+        img_addr = request.files['file']
+        img = Image.open(img_addr)
+        benign, malignant = get_prediction(img)
         return jsonify({'Benign confidence': benign, 'Malignant cofidence': malignant})
 
 ############################## Run #############################################
