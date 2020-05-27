@@ -65,3 +65,7 @@ Or you can put all parameters in a `.cfg` file with each parameter on its own li
 ```
 python3 basic_runner.py --file ./cfg/basic_runner_example.cfg
 ```
+
+## Deploying Models
+Currently there is `basic_deploy.py` located in `/deploy` folder. To launch deployment, do `bash deploy.sh`. The `basic_request.py` sends an image and get a
+confidence vector back using RESTful protocol.
