@@ -67,5 +67,12 @@ python3 basic_runner.py --file ./cfg/basic_runner_example.cfg
 ```
 
 ## Deploying Models
-Currently there is `basic_deploy.py` located in `/deploy` folder. To launch deployment, do `bash deploy.sh`. The `basic_request.py` sends an image and get a
-confidence vector back using RESTful protocol.
+To launch deployment, in `./deploy` folder do:
+```
+FLASK_ENV=development FLASK_APP=./backend.py flask run
+```
+
+Then to query an image, do:
+```
+python3 frontend.py
+```
