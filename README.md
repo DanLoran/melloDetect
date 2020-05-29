@@ -65,3 +65,14 @@ Or you can put all parameters in a `.cfg` file with each parameter on its own li
 ```
 python3 basic_runner.py --file ./cfg/basic_runner_example.cfg
 ```
+
+## Deploying Models
+To launch deployment, in `./deploy` folder do:
+```
+FLASK_ENV=development FLASK_APP=./backend.py flask run
+```
+
+Then to query an image, do:
+```
+python3 frontend.py
+```
