@@ -7,7 +7,7 @@ from flask import Flask, jsonify, request
 
 import torch
 import argparse
-
+import io
 import sys
 sys.path.append('../')
 
@@ -18,18 +18,18 @@ app = Flask(__name__)
 
 ############################### Model Setup ####################################
 model = transfer.resnet18()
-model.load_state_dict(torch.load('../weight/epoch4'))
+#model.load_state_dict(torch.load('../weight/epoch4'))
 model.eval()
 ############################## Inference Setup #################################
 
-def transform_image(img_addr):
+def transform_image(img_byte):
     my_transforms = transforms.Compose([transforms.Resize(256),transforms.ToTensor()])
-    img = Image.open(img_addr)
+    img = Image.open(io.BytesIO(img_byte))
     return my_transforms(img)[None, :, :, :]
 
 
-def get_prediction(img):
-    inp = transform_image(img)
+def get_prediction(img_byte):
+    inp = transform_image(img_byte)
     out = model(inp)
     benign = str(out[0][0].item())
     malignant = str(out[0][1].item())
@@ -39,8 +39,8 @@ def get_prediction(img):
 @app.route('/predict', methods=['POST'])
 def predict():
     if request.method == 'POST':
-        img_addr = request.data.decode("utf-8")
-        benign, malignant = get_prediction(img_addr)
+        img_byte = request.data
+        benign, malignant = get_prediction(img_byte)
     return jsonify({'Benign confidence': benign, 'Malignant cofidence': malignant})
 
 ############################## Run #############################################
