@@ -22,4 +22,4 @@ stop:
 	docker stop mello
 
 test:
-	python3 -m pytest
+	python3 -m pytest test/
