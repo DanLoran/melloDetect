@@ -1,29 +1,46 @@
 import random
 import os
 import csv
-from PIL import Image
 from torch.utils.data import Dataset
 import torch
 from torchvision.transforms import ToTensor
 from mellolib.globalConstants import FIELDS
 from mellolib.augment import identity
 from math import floor
+from .reader import readSmallImg, readImage
 
 class SimpleDataset(Dataset):
     '''
     Simply read images, apply augmentations, and return them.
     '''
     # Data is a list of the form [('path', [label]), ...]
-    def __init__(self, data, augmentations):
+    def __init__(self, data, augmentations, model = None):
         self.data = data
         self.augmentations = augmentations
         self.num_augmentations = sum([a.num for a in augmentations])
+        self.model = model
 
     def __getitem__(self, index):
         base_index = floor(index / self.num_augmentations)
         augmentation_index = index % self.num_augmentations
 
-        image = Image.open(self.data[base_index][0]).resize([256, 256])
+        # Convert label to torch vector.
+        label = torch.FloatTensor(self.data[base_index][1])
+
+        if self.model != None:
+            # if a model was specified, get the vector of features
+            try:
+                inputTensor = ReadVectorImage(self.data[base_index][0])
+                return inputTensor, label
+            except:
+                pass
+
+        try:
+            # attempt to read small images ...
+            image = readSmallImg(self.data[base_index][0])
+        except FileNotFoundError:
+            # ... and if not found, get normal images
+            image = readImage(self.data[base_index][0])
 
         # pick the augmentation to apply
         for augmentation in self.augmentations:
@@ -31,7 +48,10 @@ class SimpleDataset(Dataset):
                 image = augmentation(image, augmentation_index)
             augmentation_index -= augmentation.num
 
-        return ToTensor()(image).type(torch.float), torch.FloatTensor(self.data[base_index][1])
+        # convert from PIL to pytorch tensor
+        inputTensor = ToTensor()(image).type(torch.float)
+
+        return inputTensor, label
 
     def __len__(self):
         return len(self.data) * self.num_augmentations
@@ -52,7 +72,8 @@ class Splitter:
                  train_validate_ratio,
                  seed,
                  num_images=None,
-                 augmentations=[]):
+                 augmentations=[],
+                 pretrained_model = None):
         """
         Parameters
         ----------
@@ -72,9 +93,14 @@ class Splitter:
             takes an image and has a "num" property which desribes how many images it will return,
             and yields some number of augmented images.
             e.g. argument: [augment.mirrorer(), white_balancer([1900, 15000])]
+        pretrained_model : torch model
+            The model is used to obtain a precomputed vector of features instead
+            of the image as image input
         """
         random.seed(seed)
         self.augmentations = augmentations + [identity()]
+
+        self.model = pretrained_model
 
         # self.data contains a list of the form [('path', [label onehot]), ...].
         # This is the base data that all indexes below refer to.
@@ -120,7 +146,7 @@ class Splitter:
         data = []
         with open(os.path.join(labels_path, "label.csv"), "r") as f:
             for row in csv.reader(f):
-                image_path = os.path.join(labels_path, row[0] + "_small.jpeg")
+                image_path = os.path.join(labels_path, row[0])
 
                 # Convert to onehot. If label equals i set 1, else set 0.
                 label_value = int(row[3])
@@ -132,9 +158,11 @@ class Splitter:
     def generate_training_data(self):
         return SimpleDataset(
             [self.data[i] for i in self.split_indexes[0][0] + self.split_indexes[1][0]],
-            self.augmentations)
+            self.augmentations,
+            self.model)
 
     def generate_validation_data(self):
         return SimpleDataset(
             [self.data[i] for i in self.split_indexes[0][1] + self.split_indexes[1][1]],
-            self.augmentations)
+            self.augmentations,
+            self.model)
