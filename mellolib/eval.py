@@ -6,23 +6,23 @@ def eval_selection(test_loader, options, model):
     gt, pred = generate_results(test_loader, options, model)
     # evaluate the model
     if options.eval_type == "AUC":
-        eval_score = val_auc(gt, pred)
+        eval_score = eval_auc(gt, pred)
         eval_name = "AUC Score "
 
     elif options.eval_type == "ACCURACY":
-        eval_score = val_accuracy(gt, pred)
+        eval_score = eval_accuracy(gt, pred)
         eval_name = "Accuracy "
 
     elif options.eval_type == "F1":
-        eval_score = val_f1(gt, pred)
+        eval_score = eval_f1(gt, pred)
         eval_name = "F1 Score "
 
     elif options.eval_type == "PRECISION":
-        eval_score = val_precision(gt, pred)
+        eval_score = eval_precision(gt, pred)
         eval_name = "Precision Score "
 
     elif options.eval_type == "RECALL":
-        eval_score = val_recall(gt, pred)
+        eval_score = eval_recall(gt, pred)
         eval_name = "Recall Score "
 
     elif options.eval_type == "TN":
