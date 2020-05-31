@@ -1,6 +1,7 @@
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
+from collections import OrderedDict
 
 class tiny_fc(nn.Module):
     def __init__(self):
@@ -18,4 +19,20 @@ class tiny_fc(nn.Module):
         x = F.relu(self.fc3(x))
         x = self.fc4(x)
         x = self.sm(x)
+        return x
+
+class resnetFC(nn.Module):
+    def __init__(self):
+        super(resnetFC, self).__init__()
+        self.fc = nn.Sequential(OrderedDict([
+            ('fc1', nn.Linear(in_features=512, out_features=100)),
+            ('relu1', nn.ReLU()),
+            ('fc2', nn.Linear(in_features=100, out_features=10)),
+            ('relu2', nn.ReLU()),
+            ('fc3', nn.Linear(in_features=10, out_features=2)),
+            ('output', nn.Softmax(dim=1))
+        ]))
+
+    def forward(self,x):
+        x = self.fc(x)
         return x

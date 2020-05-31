@@ -1,4 +1,5 @@
 from PIL import Image
+import torch
 
 """
     Function to get the tensor of an image that is already correctly sized,
@@ -42,5 +43,9 @@ def readImage(imageName):
 @model: a pre-trained model
 @return: a tensor vector
 """
-def ReadVectorImage(imageName):
-    raise NotImplementedError
+def readVectorImage(imageName, modelName):
+
+    filename = imageName + modelName + ".pt"
+    features = torch.load(filename, map_location=torch.device('cpu')).flatten()
+
+    return features

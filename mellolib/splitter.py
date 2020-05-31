@@ -7,7 +7,7 @@ from torchvision.transforms import ToTensor
 from mellolib.globalConstants import FIELDS
 from mellolib.augment import identity
 from math import floor
-from .reader import readSmallImg, readImage
+from .reader import readSmallImg, readImage, readVectorImage
 
 class SimpleDataset(Dataset):
     '''
@@ -30,9 +30,10 @@ class SimpleDataset(Dataset):
         if self.model != None:
             # if a model was specified, get the vector of features
             try:
-                inputTensor = ReadVectorImage(self.data[base_index][0])
+                inputTensor = readVectorImage(self.data[base_index][0], self.model)
                 return inputTensor, label
-            except:
+            except Exception as e:
+                # TODO: print an exception in debug mode
                 pass
 
         try:

@@ -29,7 +29,7 @@ def boolean_string(s):
 
 def model_selection(choice):
     if choice == "tiny_fc":
-        model = tiny_fc()
+        model = fcs.tiny_fc()
 
     elif choice == "tiny_cnn":
         model = tiny_cnn()
@@ -57,6 +57,9 @@ def model_selection(choice):
 
     elif choice == "trans_shufflenet":
         model = transfer.shufflenet()
+
+    elif choice == "resnet18_fc":
+        model = fcs.resnetFC()
 
     else:
         print("Architecture don't exist!")
@@ -165,6 +168,10 @@ def beefy_runner(parser):
 
     parser.add_argument("--save-if-interupt", type=boolean_string, default=True,
                         help="Save the weight if Ctrl+C interrupt. Default: true")
+
+    parser.add_argument("--pretrained_model", default=None, type=str,
+                        help="The pretrained model to use for feature extraction. \
+                         Must be used with classifier as model.")
 
 def eval_runner(parser):
     parser.add_argument("--file", type=open, action=LoadFromFile)
