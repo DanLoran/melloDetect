@@ -6,13 +6,6 @@ from mellolib.globalConstants import LOSS
 from mellolib.globalConstants import OPTIM
 from mellolib.globalConstants import EVAL
 
-for library in ARCH:
-    try:
-        if('trans' not in library):
-            exec("from mellolib.models.{module} import {module}".format(module=library))
-    except Exception as e:
-        print(e)
-
 class LoadFromFile (argparse.Action):
     def __call__(self, parser, namespace, values, option_string = None):
         with values as f:
@@ -32,7 +25,7 @@ def model_selection(choice):
         model = fcs.tiny_fc()
 
     elif choice == "tiny_cnn":
-        model = tiny_cnn()
+        model = tiny_cnn.tiny_cnn()
 
     elif choice == "trans_resnet18":
         model = transfer.resnet18()
@@ -60,6 +53,9 @@ def model_selection(choice):
 
     elif choice == "resnet18_fc":
         model = fcs.resnetFC()
+
+    elif choice == "resnet50_fc":
+        model = fcs.resnetFC2048()
 
     else:
         print("Architecture don't exist!")
@@ -138,6 +134,10 @@ def basic_runner(parser):
     parser.add_argument("--arch", type = str, choices=ARCH,
                         help="Neural network architecture")
 
+    parser.add_argument("--pretrained_model", default=None, type=str,
+                        help="The pretrained model to use for feature extraction. \
+                         Must be used with classifier as model.")
+
 def beefy_runner(parser):
     parser.add_argument("--optimizer", type = str, choices=OPTIM,
                         help="Optimization options")
@@ -169,9 +169,6 @@ def beefy_runner(parser):
     parser.add_argument("--save-if-interupt", type=boolean_string, default=True,
                         help="Save the weight if Ctrl+C interrupt. Default: true")
 
-    parser.add_argument("--pretrained_model", default=None, type=str,
-                        help="The pretrained model to use for feature extraction. \
-                         Must be used with classifier as model.")
 
 def eval_runner(parser):
     parser.add_argument("--file", type=open, action=LoadFromFile)

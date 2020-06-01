@@ -36,3 +36,19 @@ class resnetFC(nn.Module):
     def forward(self,x):
         x = self.fc(x)
         return x
+
+class resnetFC2048(nn.Module):
+    def __init__(self):
+        super(resnetFC2048, self).__init__()
+        self.fc = nn.Sequential(OrderedDict([
+            ('fc1', nn.Linear(in_features=2048, out_features=100)),
+            ('relu1', nn.ReLU()),
+            ('fc2', nn.Linear(in_features=100, out_features=10)),
+            ('relu2', nn.ReLU()),
+            ('fc3', nn.Linear(in_features=10, out_features=2)),
+            ('output', nn.Softmax(dim=1))
+        ]))
+
+    def forward(self,x):
+        x = self.fc(x)
+        return x
