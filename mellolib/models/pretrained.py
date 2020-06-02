@@ -10,27 +10,32 @@ pretrained_model_pool = {
     'alexnet': torchvision.models.alexnet(pretrained=True),
 }
 
-"""
-validate whether a certain model is available in the pool of pretrained models
-"""
+
 def validatePretrained(name):
+    """
+    validate whether a certain model is available in the pool of pretrained models
+    """
     # check whether the model is available
     assert name in pretrained_model_pool.keys()
 
-"""
-get a pretrained model with no classifier, just feature extraction,
-from the name.
-"""
+
 def getPretrainedModelNoFc(name):
+    """
+    get a pretrained model with no classifier, just feature extraction,
+    from the name.
+    """
 
     # get model
     model = pretrained_model_pool[name]
 
     # remove the final layer
-    model.fc = torch.nn.Identity()
+    if 'resnet' in name:
+        model.fc = torch.nn.Identity()
+    else:
+        model.classifier = torch.nn.Identity()
 
     # freeze the model
     for param in model.parameters():
-        param.require_grad = False;
+        param.require_grad = False
 
     return model
