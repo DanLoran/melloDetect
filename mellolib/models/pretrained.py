@@ -1,22 +1,12 @@
-import torchvision
 import torch
-
-global pretrained_model_pool
-pretrained_model_pool = {
-    'resnet18': torchvision.models.resnet18(pretrained=True),
-    'resnet34': torchvision.models.resnet34(pretrained=True),
-    'resnet50': torchvision.models.resnet50(pretrained=True),
-    'resnet101': torchvision.models.resnet101(pretrained=True),
-    'alexnet': torchvision.models.alexnet(pretrained=True),
-}
-
+from mellolib.globalConstants import PRETRAINED_MODEL_POOL
 
 def validatePretrained(name):
     """
     validate whether a certain model is available in the pool of pretrained models
     """
     # check whether the model is available
-    assert name in pretrained_model_pool.keys()
+    assert name in PRETRAINED_MODEL_POOL.keys()
 
 
 def getPretrainedModelNoFc(name):
@@ -26,7 +16,7 @@ def getPretrainedModelNoFc(name):
     """
 
     # get model
-    model = pretrained_model_pool[name]
+    model = PRETRAINED_MODEL_POOL[name]
 
     # remove the final layer
     if 'resnet' in name:
