@@ -6,7 +6,7 @@ def validatePretrained(name):
     validate whether a certain model is available in the pool of pretrained models
     """
     # check whether the model is available
-    assert name in PRETRAINED_MODEL_POOL.keys()
+    assert name in PRETRAINED_MODEL_POOL
 
 
 def getPretrainedModelNoFc(name):
@@ -15,8 +15,20 @@ def getPretrainedModelNoFc(name):
     from the name.
     """
 
-    # get model
-    model = PRETRAINED_MODEL_POOL[name]
+    # validate name of the model
+    validatePretrained(name)
+
+    # get correct model
+    if name == 'resnet18':
+        model = torchvision.models.resnet18(pretrained=True)
+    elif name == 'resnet34':
+        model = torchvision.models.resnet34(pretrained=True)
+    elif name == 'resnet50':
+        model = torchvision.models.resnet50(pretrained=True)
+    elif name == 'resnet101':
+        model = torchvision.models.resnet101(pretrained=True)
+    elif name == 'alexnet':
+        model = torchvision.models.alexnet(pretrained=True)
 
     # remove the final layer
     if 'resnet' in name:

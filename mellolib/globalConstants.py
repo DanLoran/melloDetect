@@ -21,10 +21,4 @@ LOSS = ['BCE']
 EVAL = ['AUC','ACCURACY','F1', 'PRECISION', 'RECALL','TN','TP','FN','FP']
 
 global PRETRAINED_MODEL_POOL
-PRETRAINED_MODEL_POOL = {
-    'resnet18': torchvision.models.resnet18(pretrained=True),
-    'resnet34': torchvision.models.resnet34(pretrained=True),
-    'resnet50': torchvision.models.resnet50(pretrained=True),
-    'resnet101': torchvision.models.resnet101(pretrained=True),
-    'alexnet': torchvision.models.alexnet(pretrained=True),
-}
+PRETRAINED_MODEL_POOL = ['resnet18', 'resnet34', 'resnet50', 'resnet101', 'alexnet']
