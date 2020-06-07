@@ -58,6 +58,9 @@ if __name__ == "__main__":
 
             if (not os.path.isfile(filename)):
                 # extract and save features
-                features = featurize(imageName, model)
-                torch.save(features, filename)
-                print("Featurized: " + imageName)
+                try:
+                    features = featurize(imageName, model)
+                    torch.save(features, filename)
+                    print("Featurized: " + imageName)
+                except:
+                    print("Not found:" + imageName)
