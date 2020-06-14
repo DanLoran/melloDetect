@@ -1,4 +1,5 @@
 import torch
+import torchvision
 from mellolib.globalConstants import PRETRAINED_MODEL_POOL
 
 def validatePretrained(name):
