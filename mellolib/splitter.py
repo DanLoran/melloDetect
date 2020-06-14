@@ -36,7 +36,7 @@ class SimpleDataset(Dataset):
             # if a model was specified, get the vector of features
             try:
                 inputTensor = readVectorImage(
-                    self.data[base_index][0], self.pretrained_model, self.deploy_on_gpu)
+                    self.data[base_index][0], self.pretrained_model, self.deploy_on_gpu).flatten()
                 return inputTensor, label
             except Exception as e:
                 # print exception in debug mode

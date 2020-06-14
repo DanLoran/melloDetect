@@ -49,9 +49,9 @@ def readVectorImage(imageName, modelName, deploy_on_gpu=False):
     filename = imageName + modelName + ".pt"
     if deploy_on_gpu:
         features = torch.load(
-            filename, map_location=torch.device('gpu')).flatten()
+            filename, map_location=torch.device('gpu'))
     else:
         features = torch.load(
-            filename, map_location=torch.device('cpu')).flatten()
+            filename, map_location=torch.device('cpu'))
 
     return features

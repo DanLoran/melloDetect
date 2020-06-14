@@ -251,3 +251,25 @@ def optuna_runner(parser):
 
     parser.add_argument("--criterion", type = str, choices=LOSS,
                         help="Loss equations.")
+
+def prediction_runner(parser):
+    parser.add_argument("--file", type=open, action=LoadFromFile)
+
+    parser.add_argument("--weight-filepath", type=str,
+                        help="Path to the weights of the model used for the \
+                        predictions")
+
+    parser.add_argument("--arch", type = str, choices=ARCH,
+                        help="Neural network architecture")
+
+    parser.add_argument("--data-addr", type=str, default="./valData/",
+                        help="Directory where dataset is stored. \
+                        Default:  ./valData/" )
+
+    parser.add_argument("--deploy-on-gpu", type=boolean_string, default=True,
+                        help="Run the trainer/validator on the GPU. Default:\
+                        true" )
+
+    parser.add_argument("--pretrained_model", default=None, type=str,
+                        help="The pretrained model to use for feature extraction. \
+                         Must be used with classifier as model.")
