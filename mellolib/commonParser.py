@@ -173,6 +173,9 @@ def beefy_runner(parser):
 def eval_runner(parser):
     parser.add_argument("--file", type=open, action=LoadFromFile)
 
+    parser.add_argument("--debug", type=boolean_string, default=True,
+                        help="Print verbosely. Default: true" )
+
     parser.add_argument("--deploy-on-gpu", type=boolean_string, default=True,
                         help="Run the validator on the GPU. Default:\
                         true" )
@@ -193,6 +196,10 @@ def eval_runner(parser):
 
     parser.add_argument("--arch", type = str, choices=ARCH,
                         help="Neural network architecture")
+
+    parser.add_argument("--pretrained_model", default=None, type=str,
+                        help="The pretrained model to use for feature extraction. \
+                         Must be used with classifier as model.")
 
 def optuna_runner(parser):
     parser.add_argument("--num-trials", type=int, default=20,
