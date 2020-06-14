@@ -14,22 +14,6 @@ bash ./dataset/getData.sh
 ```
 DO NOT run the `dataset/getData.sh` inside this repo. Copy the entire `./dataset` folder and put it somewhere with large storage space before downloading. The total space required is aroung 50GB. I recommend using this as using this as your database, never modify, augment or delete it. The images will be available in `Data/Images`
 
-To split the data into training and validation set, do something like:
-```
-python3 dataset/makepartition.py --p 5 --source-addr <src> --train-addr <train> --val-addr <val> --max-pull 5000
-```
-`--source-addr` is path where the database is located.
-
-`--train-addr` is the path for training data.
-
-`--val-addr` is path for validation data.
-
-`--p` is the percentage of images pulled from database that goes into validation set. (1-p) will go to train set
-
-`--max-pull` is the maximum number of images pulled from the database.
-
-After this, you can run the augmented script if need.
-
 ## :warning:	Adding new architectures :warning:
 It is crucial to follow the provided steps when adding a new architecture. We want everyone to be able to use the pipeline without any hickups. Inserting your own architecture midway in a runner file may make the runner break, and worse, if you push the runner that has a hard-code architecture in and someone else use it without knowing they are training your model! So don't be lazy :wink:, these steps will isolate your model under development from the rest of the pipeline:
 
