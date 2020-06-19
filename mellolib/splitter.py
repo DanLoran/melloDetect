@@ -159,7 +159,7 @@ class Splitter:
         for index in indexes:
             split_location = int(len(index) * train_validate_ratio)
             self.split_indexes.append(
-                [index[split_location:], index[:split_location]])
+                [index[:split_location], index[split_location:]])
 
     def read_data(self, labels_path):
         data = []
@@ -179,15 +179,15 @@ class Splitter:
             [self.data[i]
                 for i in self.split_indexes[0][0] + self.split_indexes[1][0]],
             self.augmentations,
-            pretrained_model = self.pretrained_model,
-            deploy_on_gpu = self.deploy_on_gpu,
-            debug = self.debug)
+            pretrained_model=self.pretrained_model,
+            deploy_on_gpu=self.deploy_on_gpu,
+            debug=self.debug)
 
     def generate_validation_data(self):
         return SimpleDataset(
             [self.data[i]
                 for i in self.split_indexes[0][1] + self.split_indexes[1][1]],
             self.augmentations,
-            pretrained_model = self.pretrained_model,
-            deploy_on_gpu = self.deploy_on_gpu,
-            debug = self.debug)
+            pretrained_model=self.pretrained_model,
+            deploy_on_gpu=self.deploy_on_gpu,
+            debug=self.debug)
