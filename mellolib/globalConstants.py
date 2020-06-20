@@ -20,5 +20,6 @@ LOSS = ['BCE']
 
 EVAL = ['AUC','ACCURACY','F1', 'PRECISION', 'RECALL','TN','TP','FN','FP']
 
-global PRETRAINED_MODEL_POOL
 PRETRAINED_MODEL_POOL = ['resnet18', 'resnet34', 'resnet50', 'resnet101', 'alexnet']
+
+DEPLOY_ON_GPU = None

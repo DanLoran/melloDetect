@@ -1,3 +1,5 @@
+import mellolib.globalConstants
+
 import torch
 import numpy as np
 from sklearn.metrics import roc_auc_score, f1_score, precision_score, recall_score, confusion_matrix
@@ -56,8 +58,7 @@ def generate_results(test_loader, options, model):
     model.eval()
 
     for inp, target in test_loader:
-
-        if (options.deploy_on_gpu):
+        if mellolib.globalConstants.DEPLOY_ON_GPU:
             target = torch.autograd.Variable(target).cuda()
             inp = torch.autograd.Variable(inp).cuda()
         else:

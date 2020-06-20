@@ -5,6 +5,7 @@ from mellolib.globalConstants import ARCH
 from mellolib.globalConstants import LOSS
 from mellolib.globalConstants import OPTIM
 from mellolib.globalConstants import EVAL
+import mellolib.globalConstants
 
 class LoadFromFile (argparse.Action):
     def __call__(self, parser, namespace, values, option_string = None):
@@ -62,6 +63,17 @@ def model_selection(choice):
         exit(1)
 
     return model
+
+def init_model(options):
+    model = model_selection(options.arch)
+    mellolib.globalConstants.DEPLOY_ON_GPU = options.deploy_on_gpu
+    if (mellolib.globalConstants.DEPLOY_ON_GPU):
+        if (not torch.cuda.is_available()):
+            raise EnvironmentError('GPU requested but cuda not available.')
+        model = model.cuda()
+        print("Deploying model on: " + torch.cuda.get_device_name(torch.cuda.current_device()) + "\n")
+    return model
+
 
 def optimizer_selection(choice, params, lr, momentum):
     if choice == "SGD":
