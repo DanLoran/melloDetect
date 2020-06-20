@@ -75,9 +75,6 @@ with open(os.path.join(options.data_addr, "label.csv"), "r") as f:
             debug=True,
             deploy_on_gpu=options.deploy_on_gpu))
 
-        if pred[0][0] > pred[0][1]:
-            outcome = 0
-        else:
-            outcome = 1
+        prob = str(pred[0][1].detach().numpy())
 
-        outputFile.write(row[0] + "," + str(outcome) + "\n")
+        outputFile.write(row[0] + "," + prob + "\n")
