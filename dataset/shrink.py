@@ -10,8 +10,12 @@ def read_shrink_write(path):
     dst = path + "_small.jpeg"
 
     # .jpeg extension -- need no conversion, just resizing
-    if os.path.isfile(path + ".jpeg") or os.path.isfile(path + ".jpg"):
+    if os.path.isfile(path + ".jpeg"):
         Image.open(path + ".jpeg").resize([256, 256]).save(dst)
+        return True
+
+    if os.path.isfile(path + ".jpg"):
+        Image.open(path + ".jpg").resize([256, 256]).save(dst)
         return True
 
     # .png extensions -- need conversion to RBG from ARGB, and resizing
