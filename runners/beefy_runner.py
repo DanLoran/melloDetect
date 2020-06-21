@@ -13,9 +13,9 @@ sys.path.append('../')
 
 from mellolib import commonParser as cmp
 from mellolib.splitter import Splitter
-from mellolib.globalConstants import ARCH
 from mellolib.models import transfer
 from mellolib.eval import eval_selection
+import mellolib.globalConstants
 
 ############################ Setup parser ######################################
 parser = argparse.ArgumentParser()
@@ -40,17 +40,9 @@ if(options.show_visdom):
 
 ########################## Choose architecture #################################
 cmp.DEBUGprint("Loading model. \n", options.debug)
-model = cmp.model_selection(options.arch)
+model = cmp.init_model(options)
 
 ########################### Environment setup ##################################
-
-# Setup GPU
-if (options.deploy_on_gpu):
-    if (not torch.cuda.is_available()):
-        print("GPU device doesn't exist")
-    else:
-        model = model.cuda()
-        print("Deploying model on: " + torch.cuda.get_device_name(torch.cuda.current_device()) + "\n")
 
 # Resume from checkpoint option
 cmp.DEBUGprint("Loading previous state. \n", options.debug)
@@ -106,7 +98,7 @@ try:
     for ep in tqdm(range(n_eps)):
         for inp, target in loader:
             loop_itr += 1
-            if options.deploy_on_gpu:
+            if mellolib.globalConstants.DEPLOY_ON_GPU:
                 target = torch.autograd.Variable(target).cuda()
                 inp = torch.autograd.Variable(inp).cuda()
             else:

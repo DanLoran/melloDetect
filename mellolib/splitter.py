@@ -17,12 +17,11 @@ class SimpleDataset(Dataset):
     # Data is a list of the form [('path', [label]), ...]
 
     def __init__(self, data, augmentations,
-                 pretrained_model=None, deploy_on_gpu=False, debug=False):
+                 pretrained_model=None, debug=False):
         self.data = data
         self.augmentations = augmentations
         self.num_augmentations = sum([a.num for a in augmentations])
         self.pretrained_model = pretrained_model
-        self.deploy_on_gpu = deploy_on_gpu
         self.debug = debug
 
     def __getitem__(self, index):
@@ -36,7 +35,7 @@ class SimpleDataset(Dataset):
             # if a model was specified, get the vector of features
             try:
                 inputTensor = readVectorImage(
-                    self.data[base_index][0], self.pretrained_model, self.deploy_on_gpu).flatten()
+                    self.data[base_index][0], self.pretrained_model).flatten()
                 return inputTensor, label
             except Exception as e:
                 # print exception in debug mode
@@ -85,7 +84,6 @@ class Splitter:
                  num_images=None,
                  augmentations=[],
                  pretrained_model=None,
-                 deploy_on_gpu=False,
                  debug=False):
         """
         Parameters
@@ -109,14 +107,11 @@ class Splitter:
         pretrained_model : torch model
             The model is used to obtain a precomputed vector of features instead
             of the image as image input. Default is None.
-        deploy_on_gpu: boolean
-            Whether to deploy the model on gpu or cpu. Default is false.
         """
         random.seed(seed)
         self.augmentations = augmentations + [identity()]
 
         self.pretrained_model = pretrained_model
-        self.deploy_on_gpu = deploy_on_gpu
         self.debug = debug
 
         # self.data contains a list of the form [('path', [label onehot]), ...].
@@ -180,7 +175,6 @@ class Splitter:
                 for i in self.split_indexes[0][0] + self.split_indexes[1][0]],
             self.augmentations,
             pretrained_model=self.pretrained_model,
-            deploy_on_gpu=self.deploy_on_gpu,
             debug=self.debug)
 
     def generate_validation_data(self):
@@ -189,5 +183,4 @@ class Splitter:
                 for i in self.split_indexes[0][1] + self.split_indexes[1][1]],
             self.augmentations,
             pretrained_model=self.pretrained_model,
-            deploy_on_gpu=self.deploy_on_gpu,
             debug=self.debug)

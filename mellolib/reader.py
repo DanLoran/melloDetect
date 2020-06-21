@@ -1,4 +1,5 @@
 from PIL import Image
+import mellolib.globalConstants
 import torch
 
 
@@ -38,7 +39,7 @@ def readImage(imageName):
     return Image.open(imageName + ".png").convert("RGB").resize([256, 256])
 
 
-def readVectorImage(imageName, modelName, deploy_on_gpu=False):
+def readVectorImage(imageName, modelName):
     """
         Function to get a vector that corresponds to the features extracted by
         a pre-trained neural network
@@ -47,11 +48,6 @@ def readVectorImage(imageName, modelName, deploy_on_gpu=False):
     @return: a tensor vector
     """
     filename = imageName + modelName + ".pt"
-    if deploy_on_gpu:
-        features = torch.load(
-            filename, map_location=torch.device('gpu'))
-    else:
-        features = torch.load(
-            filename, map_location=torch.device('cpu'))
-
-    return features
+    map_location = torch.device(
+        'gpu' if mellolib.globalConstants.DEPLOY_ON_GPU else 'cpu')
+    return torch.load(filename, map_location=map_location)

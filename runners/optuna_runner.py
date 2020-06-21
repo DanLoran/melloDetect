@@ -18,8 +18,8 @@ sys.path.append('../')
 from mellolib.eval import generate_results, eval_auc
 from mellolib import commonParser as cmp
 from mellolib.readData import MelloDataSet
-from mellolib.globalConstants import ARCH
 from mellolib.models import transfer
+import mellolib.globalConstants
 from datetime import datetime
 
 import optuna
@@ -28,7 +28,7 @@ from sklearn.externals import joblib
 def train(model, loader, criterion, optimizer, epoch, options):
     model.train()
     for batch_idx, (inp, target) in enumerate(loader):
-        if options.deploy_on_gpu:
+        if mellolib.globalConstants.DEPLOY_ON_GPU:
             target = torch.autograd.Variable(target).cuda()
             inp = torch.autograd.Variable(inp).cuda()
         else:
@@ -75,7 +75,7 @@ def objective(trial, options):
     '''
 
     #------------------------------Final layers--------------------------------#
-    model = cmp.model_selection(options.arch)
+    model = cmp.init_model(options)
     # Option 1:
     # Nothing here
 
@@ -130,13 +130,6 @@ def objective(trial, options):
     #--------------------------------------------------------------------------#
 
 ################################################################################
-
-    if (options.deploy_on_gpu):
-        if (not torch.cuda.is_available()):
-            print("GPU device doesn't exist")
-        else:
-            model = model.cuda()
-            print("Deploying model on: " + torch.cuda.get_device_name(torch.cuda.current_device()) + "\n")
 
     now = datetime.now()
     date = datetime.timestamp(now)
