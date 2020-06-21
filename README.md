@@ -35,6 +35,16 @@ Runner files are located in `./runners`, they are python script that stitch all 
 2. `beefy_runner.py` is an extension of `basic_runner.py` that allows you to specify optimizer, learning rate, momentum (if applicable), batch size, epoch number, loss function, shuffle input data, evaluation type, on top of all parameters provided by `basic_runner.py`.
 3. `eval_runner.py` is an evaluation only runner that returns a range of evaluation metric given an architecture and a weight file.
 4. `optuna_runner.py` is a hyperparameter autotuner that essentially is `beefy_runner.py` but with `lr`, `momentum` and `optimizer` automatically probed.
+5. `prediction_runner.py` is a predictor which requires an input set of weights
+and images and will produce a csv file with the predicitons. The prediction will
+not be quantized to 0 or 1, but instead will contain the probability of belonging
+to a certain class.
+
+Example:<br>
+**image_name**,**target**<br>
+image 1,0.8<br>
+image 2,0.9<br>
+...<br>
 
 To see the list of parameters, do
 ```
