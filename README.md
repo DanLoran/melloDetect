@@ -30,21 +30,27 @@ For models you wrote from scratch:
 4. You can start calling your model in the config files.
 
 ## Training runners
-Runner files are located in `./runners`, they are python script that stitch all mellolib and pytorch routine together to train a model. There are:
-1. `basic_runner.py` which can only do a limited range of training, but it is fast to develop/test new architecture. It can also be used as template to develop more sophisticated runners. The runner will train with: Adam optimizer doing Binary Cross Entropy Loss calculation. The runner will run for 10 epochs with batch size of 32 and learning rate of 0.001. The evaluation metric is AUC.
-2. `beefy_runner.py` is an extension of `basic_runner.py` that allows you to specify optimizer, learning rate, momentum (if applicable), batch size, epoch number, loss function, shuffle input data, evaluation type, on top of all parameters provided by `basic_runner.py`.
-3. `eval_runner.py` is an evaluation only runner that returns a range of evaluation metric given an architecture and a weight file.
-4. `optuna_runner.py` is a hyperparameter autotuner that essentially is `beefy_runner.py` but with `lr`, `momentum` and `optimizer` automatically probed.
-5. `prediction_runner.py` is a predictor which requires an input set of weights
-and images and will produce a csv file with the predicitons. The prediction will
-not be quantized to 0 or 1, but instead will contain the probability of belonging
-to a certain class.
+Runner files are located in `./runners`, they are python script that stitch all mellolib and pytorch routine together to train a model. 
+
+#### basic_runner.py
+It can only do a limited range of training, but it is fast to develop/test new architecture. It can also be used as template to develop more sophisticated runners. The runner will train with: Adam optimizer doing Binary Cross Entropy Loss calculation. The runner will run for 10 epochs with batch size of 32 and learning rate of 0.001. The evaluation metric is AUC.
+#### beefy_runner.py
+It's an extension of `basic_runner.py` that allows you to specify optimizer, learning rate, momentum (if applicable), batch size, epoch number, loss function, shuffle input data, evaluation type, on top of all parameters provided by `basic_runner.py`.
+#### eval_runner.py
+It is an evaluation only runner that returns a range of evaluation metric given an architecture and a weight file.
+#### optuna_runner.py
+is a hyperparameter autotuner that essentially is `beefy_runner.py` but with `lr`, `momentum` and `optimizer` automatically probed.
+#### prediction_runner.py
+It's a predictor which requires an input set of weights and images and will produce a csv file with the predicitons. The prediction will
+not be quantized to 0 or 1, but instead will contain the probability of belonging to a certain class.
 
 Example:<br>
-**image_name**,**target**<br>
+*image_name*,*target*<br>
 image 1,0.8<br>
 image 2,0.9<br>
 ...<br>
+
+### How to run
 
 To see the list of parameters, do
 ```
