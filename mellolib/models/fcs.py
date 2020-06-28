@@ -21,9 +21,9 @@ class tiny_fc(nn.Module):
         x = self.sm(x)
         return x
 
-class resnetFC(nn.Module):
+class FC512(nn.Module):
     def __init__(self):
-        super(resnetFC, self).__init__()
+        super(FC512, self).__init__()
         self.fc = nn.Sequential(OrderedDict([
             ('fc1', nn.Linear(in_features=512, out_features=100)),
             ('relu1', nn.ReLU()),
@@ -37,9 +37,9 @@ class resnetFC(nn.Module):
         x = self.fc(x)
         return x
 
-class resnetFC2048(nn.Module):
+class FC2048(nn.Module):
     def __init__(self):
-        super(resnetFC2048, self).__init__()
+        super(FC2048, self).__init__()
         self.fc = nn.Sequential(OrderedDict([
             ('fc1', nn.Linear(in_features=2048, out_features=100)),
             ('relu1', nn.ReLU()),

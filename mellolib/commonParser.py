@@ -52,16 +52,16 @@ def model_selection(choice):
     elif choice == "trans_shufflenet":
         model = transfer.shufflenet()
 
-    elif choice == "resnet18_fc":
-        model = fcs.resnetFC()
+    elif choice == "features_512":
+        model = fcs.FC512()
 
-    elif choice == "resnet50_fc":
-        model = fcs.resnetFC2048()
-
-    elif choice == "fc513":
+    elif choice == "features_513":
         model = fcs.FC513()
 
-    elif choice == "fc2049":
+    elif choice == "features_2048":
+        model = fcs.FC2048()
+
+    elif choice == "features_2049":
         model = fcs.FC2049()
 
     else:
