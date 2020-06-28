@@ -13,7 +13,8 @@ ARCH = ['tiny_fc',
         'trans_shufflenet',
         'resnet18_fc',
         'resnet50_fc',
-        'fc513']
+        'fc513',
+        'fc2049']
 
 OPTIM = ['SGD','Adam']
 

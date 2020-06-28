@@ -61,6 +61,9 @@ def model_selection(choice):
     elif choice == "fc513":
         model = fcs.FC513()
 
+    elif choice == "fc2049":
+        model = fcs.FC2049()
+
     else:
         print("Architecture don't exist!")
         exit(1)
