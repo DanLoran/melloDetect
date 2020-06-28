@@ -58,6 +58,9 @@ def model_selection(choice):
     elif choice == "resnet50_fc":
         model = fcs.resnetFC2048()
 
+    elif choice == "fc513":
+        model = fcs.FC513()
+
     else:
         print("Architecture don't exist!")
         exit(1)
@@ -150,6 +153,9 @@ def basic_runner(parser):
                         help="The pretrained model to use for feature extraction. \
                          Must be used with classifier as model.")
 
+    parser.add_argument("--use_sex", type=boolean_string, default=False,
+                        help="Use sex as additional features.")
+
 def beefy_runner(parser):
     parser.add_argument("--optimizer", type = str, choices=OPTIM,
                         help="Optimization options")
@@ -212,6 +218,9 @@ def eval_runner(parser):
     parser.add_argument("--pretrained_model", default=None, type=str,
                         help="The pretrained model to use for feature extraction. \
                          Must be used with classifier as model.")
+
+    parser.add_argument("--use_sex", type=boolean_string, default=False,
+                        help="Use sex as additional features.")
 
 def optuna_runner(parser):
     parser.add_argument("--num-trials", type=int, default=20,
