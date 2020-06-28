@@ -40,10 +40,19 @@ if __name__ == "__main__":
         type=str,
         help="the directory where the images and label are located"
     )
+    parser.add_argument(
+        "--output", "-o",
+        type=str,
+        default = "", help="output directory"
+    )
     args = parser.parse_args()
 
     # validate the model name
     validatePretrained(args.model)
+
+    # define output directory if not specified
+    if args.output == "":
+        args.output = args.data_dir
 
     # get the model
     model = getPretrainedModelNoFc(args.model)
@@ -54,7 +63,7 @@ if __name__ == "__main__":
 
             # build imagename and filename
             imageName = os.path.join(args.data_dir,row[0])
-            filename = imageName + args.model + ".pt"
+            filename = os.path.join(args.output, row[0]) + args.model + ".pt"
 
             if (not os.path.isfile(filename)):
                 # extract and save features
