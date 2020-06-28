@@ -297,3 +297,6 @@ def prediction_runner(parser):
     parser.add_argument("--pretrained_model", default=None, type=str,
                         help="The pretrained model to use for feature extraction. \
                          Must be used with classifier as model.")
+
+    parser.add_argument("--use_sex", type=boolean_string, default=False,
+                        help="Use sex as additional features.")
