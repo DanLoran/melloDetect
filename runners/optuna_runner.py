@@ -17,7 +17,7 @@ sys.path.append('../')
 
 from mellolib.eval import generate_results, eval_auc
 from mellolib import commonParser as cmp
-from mellolib.readData import MelloDataSet
+from mellolib.splitter import Splitter
 from mellolib.models import transfer
 import mellolib.globalConstants
 from datetime import datetime
@@ -53,10 +53,14 @@ def test(model, loader, options):
     return score
 
 def objective(trial, options):
-    train_dataset = MelloDataSet(options.train_addr, transforms=Compose([Resize((256,256)), ToTensor()]))
-    train_loader = torch.utils.data.DataLoader(train_dataset, batch_size=options.batch_size, shuffle=options.shuffle, num_workers=6, pin_memory=True)
-    test_dataset = MelloDataSet(options.val_addr, transforms=Compose([Resize((256,256)), ToTensor()]))
-    test_loader = torch.utils.data.DataLoader(test_dataset, batch_size=1, num_workers=6, pin_memory=True)
+    dataset_generator = Splitter(options.data_addr, options.split, options.seed,
+        pretrained_model=options.pretrained_model, debug=options.debug)
+
+    train_dataset = dataset_generator.generate_training_data()
+    train_loader =  torch.utils.data.DataLoader(train_dataset, batch_size=options.batch_size, shuffle=options.shuffle)
+
+    test_dataset = dataset_generator.generate_validation_data()
+    test_loader = torch.utils.data.DataLoader(test_dataset, batch_size=1)
 
     criterion = cmp.criterion_selection(options.criterion)
 
@@ -80,19 +84,19 @@ def objective(trial, options):
     # Nothing here
 
     # Option 2:
-    num_layers = trial.suggest_int('num_layers',1,3)
-    layer_list = []
-    prev_num_neurons = 512
-    for i in range(num_layers):
-        num_neurons = int(trial.suggest_loguniform('num_neurons_{}'.format(i),4,prev_num_neurons))
-        layer_list.append(('fc_{}'.format(i), nn.Linear(prev_num_neurons,num_neurons)))
-        layer_list.append(('relu_{}'.format(i), nn.ReLU()))
-        prev_num_neurons = num_neurons
-
-    layer_list.append(('fc_last', nn.Linear(in_features=num_neurons, out_features=2)))
-    layer_list.append(('output', nn.Softmax(dim=1)))
-    fc = nn.Sequential(OrderedDict(layer_list))
-    model.fc = fc
+    # num_layers = trial.suggest_int('num_layers',1,3)
+    # layer_list = []
+    # prev_num_neurons = 512
+    # for i in range(num_layers):
+    #     num_neurons = int(trial.suggest_loguniform('num_neurons_{}'.format(i),4,prev_num_neurons))
+    #     layer_list.append(('fc_{}'.format(i), nn.Linear(prev_num_neurons,num_neurons)))
+    #     layer_list.append(('relu_{}'.format(i), nn.ReLU()))
+    #     prev_num_neurons = num_neurons
+    #
+    # layer_list.append(('fc_last', nn.Linear(in_features=num_neurons, out_features=2)))
+    # layer_list.append(('output', nn.Softmax(dim=1)))
+    # fc = nn.Sequential(OrderedDict(layer_list))
+    # model.fc = fc
 
     #--------------------------------------------------------------------------#
 
