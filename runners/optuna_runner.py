@@ -23,7 +23,7 @@ import mellolib.globalConstants
 from datetime import datetime
 
 import optuna
-from sklearn.externals import joblib
+import joblib
 
 def train(model, loader, criterion, optimizer, epoch, options):
     model.train()
@@ -110,27 +110,27 @@ def objective(trial, options):
 
     #-------------------------------Momentum-----------------------------------#
     # Options 1:
-    momentum = options.momentum_fix
+    # momentum = options.momentum_fix
 
     # Options 2:
-    # momentum = trial.suggest_uniform('momentum', options.momentum_lower, options.momentum_upper)
+    momentum = trial.suggest_uniform('momentum', options.momentum_lower, options.momentum_upper)
     #--------------------------------------------------------------------------#
 
     #--------------------------------Optimizer---------------------------------#
     optimizer_list = {'SGD': optim.SGD, 'RMSprop': optim.RMSprop, 'Adam': optim.Adam}
 
     # Options 1:
-    optimizer = optimizer_list['Adam'](model.parameters(), lr=lr)
+    # optimizer = optimizer_list['Adam'](model.parameters(), lr=lr)
 
     # Options 2:
-    # optimizer_name = trial.suggest_categorical('optimizer',['SGD','RMSprop','Adam'])
-    # if (optimizer_name == 'SGD' or optimizer_name == 'RMSprop'):
-    #     optimizer = optimizer_list[optimizer_name](model.parameters(), momentum=momentum, lr=lr)
-    # elif (optimizer_name == 'Adam'):
-    #     optimizer = optimizer_list['Adam'](model.parameters(), lr=lr)
-    # else:
-    #     print("Error: please check optimizer_list and optimizer_name")
-    #     exit(-1)
+    optimizer_name = trial.suggest_categorical('optimizer',['SGD','RMSprop','Adam'])
+    if (optimizer_name == 'SGD' or optimizer_name == 'RMSprop'):
+        optimizer = optimizer_list[optimizer_name](model.parameters(), momentum=momentum, lr=lr)
+    elif (optimizer_name == 'Adam'):
+        optimizer = optimizer_list['Adam'](model.parameters(), lr=lr)
+    else:
+        print("Error: please check optimizer_list and optimizer_name")
+        exit(-1)
     #--------------------------------------------------------------------------#
 
 ################################################################################
