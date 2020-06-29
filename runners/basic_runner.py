@@ -74,7 +74,8 @@ batch_size = 32
 lr = 0.001
 optimizer = Adam(model.parameters(), lr=lr)
 criterion = BCELoss()
-dataset_generator = Splitter(options.data_addr, options.split, options.seed, pretrained_model=options.pretrained_model)
+dataset_generator = Splitter(options.data_addr, options.split, options.seed,
+    pretrained_model=options.pretrained_model, use_sex=options.use_sex)
 dataset = dataset_generator.generate_training_data()
 loader = torch.utils.data.DataLoader(dataset, batch_size=batch_size, shuffle=True)
 batch_n = 0

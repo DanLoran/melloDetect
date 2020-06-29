@@ -11,8 +11,10 @@ ARCH = ['tiny_fc',
         'trans_inception',
         'trans_googlenet',
         'trans_shufflenet',
-        'resnet18_fc',
-        'resnet50_fc']
+        'features_512',
+        'features_513',
+        'features_2048',
+        'features_2049']
 
 OPTIM = ['SGD','Adam']
 

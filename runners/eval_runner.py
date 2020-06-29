@@ -22,7 +22,8 @@ options = parser.parse_args()
 model = cmp.init_model(options)
 
 dataset_generator = Splitter(options.data_addr, options.split, options.seed,
-    pretrained_model=options.pretrained_model, debug=options.debug)
+    pretrained_model=options.pretrained_model, debug=options.debug,
+    use_sex=options.use_sex)
 test_dataset = dataset_generator.generate_validation_data()
 test_loader = torch.utils.data.DataLoader(test_dataset, batch_size=1)
 eval_score = []

@@ -16,13 +16,14 @@ class SimpleDataset(Dataset):
     '''
     # Data is a list of the form [('path', [label]), ...]
 
-    def __init__(self, data, augmentations,
-                 pretrained_model=None, debug=False):
+    def __init__(self, data, augmentations, pretrained_model=None,
+                 debug=False, use_sex=False):
         self.data = data
         self.augmentations = augmentations
         self.num_augmentations = sum([a.num for a in augmentations])
         self.pretrained_model = pretrained_model
         self.debug = debug
+        self.use_sex = use_sex
 
     def __getitem__(self, index):
         base_index = floor(index / self.num_augmentations)
@@ -36,6 +37,12 @@ class SimpleDataset(Dataset):
             try:
                 inputTensor = readVectorImage(
                     self.data[base_index][0], self.pretrained_model).flatten()
+
+                if self.use_sex:
+                    # concatenate a torch tensor containing the sex information
+                    sex = torch.FloatTensor([self.data[base_index][2]])
+                    inputTensor = torch.cat((inputTensor, sex), 0)
+
                 return inputTensor, label
             except Exception as e:
                 # print exception in debug mode
@@ -84,7 +91,8 @@ class Splitter:
                  num_images=None,
                  augmentations=[],
                  pretrained_model=None,
-                 debug=False):
+                 debug=False,
+                 use_sex=False):
         """
         Parameters
         ----------
@@ -107,12 +115,19 @@ class Splitter:
         pretrained_model : torch model
             The model is used to obtain a precomputed vector of features instead
             of the image as image input. Default is None.
+        debug: bool
+            Whether to print debug information. Default is False
+        use_sex: bool
+            Whether to use sex as additional feature to append to the features
+            vector. pretrained_model must not be None. Default is False
         """
         random.seed(seed)
         self.augmentations = augmentations + [identity()]
-
         self.pretrained_model = pretrained_model
         self.debug = debug
+        if use_sex:
+            assert self.pretrained_model != None
+            self.use_sex = use_sex
 
         # self.data contains a list of the form [('path', [label onehot]), ...].
         # This is the base data that all indexes below refer to.
@@ -166,7 +181,9 @@ class Splitter:
                 label_value = int(row[3])
                 label = [int(label_value == i) for i in range(len(FIELDS))]
 
-                data.append((image_path, label))
+                # read sex from current row
+                sex = int(row[2])
+                data.append((image_path, label, sex))
         return data
 
     def generate_training_data(self):
@@ -175,7 +192,8 @@ class Splitter:
                 for i in self.split_indexes[0][0] + self.split_indexes[1][0]],
             self.augmentations,
             pretrained_model=self.pretrained_model,
-            debug=self.debug)
+            debug=self.debug,
+            use_sex=self.use_sex)
 
     def generate_validation_data(self):
         return SimpleDataset(
@@ -183,4 +201,5 @@ class Splitter:
                 for i in self.split_indexes[0][1] + self.split_indexes[1][1]],
             self.augmentations,
             pretrained_model=self.pretrained_model,
-            debug=self.debug)
+            debug=self.debug,
+            use_sex=self.use_sex)
