@@ -134,9 +134,9 @@ class Splitter:
         self.augmentations = augmentations + [identity()]
         self.pretrained_model = pretrained_model
         self.debug = debug
+        self.use_sex = use_sex
         if use_sex:
             assert self.pretrained_model != None
-            self.use_sex = use_sex
 
         # self.data contains a list of the form [('path', [label onehot]), ...].
         # This is the base data that all indexes below refer to.
