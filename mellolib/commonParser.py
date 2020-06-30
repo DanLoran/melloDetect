@@ -159,6 +159,10 @@ def basic_runner(parser):
     parser.add_argument("--use_sex", type=boolean_string, default=False,
                         help="Use sex as additional features.")
 
+    parser.add_argument("--positive_case_percentage", type=float, default=0.5,
+                        help="Percentage of cases that will be positive. See \
+                        splitter for details")
+
 def beefy_runner(parser):
     parser.add_argument("--optimizer", type = str, choices=OPTIM,
                         help="Optimization options")
@@ -224,6 +228,10 @@ def eval_runner(parser):
 
     parser.add_argument("--use_sex", type=boolean_string, default=False,
                         help="Use sex as additional features.")
+
+    parser.add_argument("--positive_case_percentage", type=float, default=0.5,
+                        help="Percentage of cases that will be positive. See \
+                        splitter for details")
 
 def optuna_runner(parser):
     parser.add_argument("--num-trials", type=int, default=20,
