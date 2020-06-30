@@ -64,7 +64,8 @@ criterion = cmp.criterion_selection(options.criterion)
 dataset_generator = Splitter(options.data_addr, options.split, options.seed,
     pretrained_model=options.pretrained_model,
     debug=options.debug,
-    use_sex=options.use_sex)
+    use_sex=options.use_sex,
+    positive_case_percent=options.positive_case_percent)
 dataset = dataset_generator.generate_training_data()
 loader = torch.utils.data.DataLoader(dataset, batch_size=batch_size, shuffle=options.shuffle)
 
