@@ -159,7 +159,7 @@ def basic_runner(parser):
     parser.add_argument("--use_sex", type=boolean_string, default=False,
                         help="Use sex as additional features.")
 
-    parser.add_argument("--positive_case_percentage", type=float, default=0.5,
+    parser.add_argument("--positive_case_percent", type=float, default=0.5,
                         help="Percentage of cases that will be positive. See \
                         splitter for details")
 
@@ -229,7 +229,7 @@ def eval_runner(parser):
     parser.add_argument("--use_sex", type=boolean_string, default=False,
                         help="Use sex as additional features.")
 
-    parser.add_argument("--positive_case_percentage", type=float, default=0.5,
+    parser.add_argument("--positive_case_percent", type=float, default=0.5,
                         help="Percentage of cases that will be positive. See \
                         splitter for details")
 
