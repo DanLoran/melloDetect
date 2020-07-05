@@ -1,6 +1,7 @@
 import torch
 import argparse
 import numpy as np
+import torchvision as tv
 from os import listdir, path
 from os.path import isfile, join
 import sys
@@ -20,8 +21,9 @@ options = parser.parse_args()
 
 ########################## Choose architecture #################################
 model = cmp.init_model(options)
-
-dataset_generator = Splitter(options.data_addr, options.split, options.seed,
+train_transforms = model.train_transforms if (hasattr(model, 'train_transforms')) else tv.transforms.ToTensor()
+validate_transforms = model.validate_transforms if (hasattr(model, 'validate_transforms')) else tv.transforms.ToTensor()
+dataset_generator = Splitter(options.data_addr, options.split, options.seed, train_transforms, validate_transforms,
     pretrained_model=options.pretrained_model, debug=options.debug,
     use_sex=options.use_sex, positive_case_percent=options.positive_case_percent)
 test_dataset = dataset_generator.generate_validation_data()

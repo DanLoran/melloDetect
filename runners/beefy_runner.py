@@ -8,6 +8,7 @@ from torch.nn import BCELoss
 from sklearn.metrics import roc_auc_score
 from tqdm import tqdm
 from datetime import datetime
+import torchvision as tv
 import sys
 sys.path.append('../')
 
@@ -61,7 +62,9 @@ n_eps = options.epoch
 batch_size = options.batch_size
 optimizer = cmp.optimizer_selection(options.optimizer, model.parameters(), options.lr, options.momentum)
 criterion = cmp.criterion_selection(options.criterion)
-dataset_generator = Splitter(options.data_addr, options.split, options.seed,
+train_transforms = model.train_transforms if (hasattr(model, 'train_transforms')) else tv.transforms.ToTensor()
+validate_transforms = model.validate_transforms if (hasattr(model, 'validate_transforms')) else tv.transforms.ToTensor()
+dataset_generator = Splitter(options.data_addr, options.split, options.seed, train_transforms, validate_transforms,
     pretrained_model=options.pretrained_model,
     debug=options.debug,
     use_sex=options.use_sex,

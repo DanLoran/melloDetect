@@ -3,7 +3,7 @@ import os
 import csv
 from torch.utils.data import Dataset
 import torch
-from torchvision.transforms import ToTensor
+import torchvision as tv
 from mellolib.globalConstants import FIELDS
 from mellolib.augment import identity
 from math import floor
@@ -17,7 +17,7 @@ class SimpleDataset(Dataset):
     '''
     # Data is a list of the form [('path', [label]), ...]
 
-    def __init__(self, data, augmentations, pretrained_model=None,
+    def __init__(self, data, augmentations, transformations, pretrained_model=None,
                  debug=False, use_sex=False):
         self.data = data
         self.augmentations = augmentations
@@ -25,6 +25,7 @@ class SimpleDataset(Dataset):
         self.pretrained_model = pretrained_model
         self.debug = debug
         self.use_sex = use_sex
+        self.transformations = transformations
 
     def __getitem__(self, index):
         base_index = floor(index / self.num_augmentations)
@@ -65,7 +66,7 @@ class SimpleDataset(Dataset):
             augmentation_index -= augmentation.num
 
         # convert from PIL to pytorch tensor
-        inputTensor = ToTensor()(image).type(torch.float)
+        inputTensor = self.transformations(image).type(torch.float)
 
         return inputTensor, label
 
@@ -89,6 +90,8 @@ class Splitter:
                  labels_path,
                  train_validate_ratio,
                  seed,
+                 train_transformations,
+                 validate_transformations,
                  num_images=None,
                  augmentations=[],
                  pretrained_model=None,
@@ -135,6 +138,8 @@ class Splitter:
         self.pretrained_model = pretrained_model
         self.debug = debug
         self.use_sex = use_sex
+        self.train_transformations = train_transformations
+        self.validate_transformations = validate_transformations
         if use_sex:
             assert self.pretrained_model != None
 
@@ -208,6 +213,7 @@ class Splitter:
             [self.data[i]
                 for i in self.split_indexes[0][0] + self.split_indexes[1][0]],
             self.augmentations,
+            self.train_transformations,
             pretrained_model=self.pretrained_model,
             debug=self.debug,
             use_sex=self.use_sex)
@@ -217,6 +223,7 @@ class Splitter:
             [self.data[i]
                 for i in self.split_indexes[0][1] + self.split_indexes[1][1]],
             self.augmentations,
+            self.validate_transformations,
             pretrained_model=self.pretrained_model,
             debug=self.debug,
             use_sex=self.use_sex)
