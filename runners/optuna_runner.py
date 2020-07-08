@@ -54,7 +54,8 @@ def test(model, loader, options):
 
 def objective(trial, options):
     dataset_generator = Splitter(options.data_addr, options.split, options.seed,
-        pretrained_model=options.pretrained_model, debug=options.debug)
+        pretrained_model=options.pretrained_model, debug=options.debug,
+        positive_case_percent=options.positive_case_percent)
 
     train_dataset = dataset_generator.generate_training_data()
     train_loader =  torch.utils.data.DataLoader(train_dataset, batch_size=options.batch_size, shuffle=options.shuffle)

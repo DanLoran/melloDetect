@@ -52,11 +52,17 @@ def model_selection(choice):
     elif choice == "trans_shufflenet":
         model = transfer.shufflenet()
 
-    elif choice == "resnet18_fc":
-        model = fcs.resnetFC()
+    elif choice == "features_512":
+        model = fcs.FC512()
 
-    elif choice == "resnet50_fc":
-        model = fcs.resnetFC2048()
+    elif choice == "features_513":
+        model = fcs.FC513()
+
+    elif choice == "features_2048":
+        model = fcs.FC2048()
+
+    elif choice == "features_2049":
+        model = fcs.FC2049()
 
     elif choice == "efficient_net_b0_fc":
         model = fcs.FC1280()
@@ -156,6 +162,13 @@ def basic_runner(parser):
                         help="The pretrained model to use for feature extraction. \
                          Must be used with classifier as model.")
 
+    parser.add_argument("--use_sex", type=boolean_string, default=False,
+                        help="Use sex as additional features.")
+
+    parser.add_argument("--positive_case_percent", type=float, default=0.5,
+                        help="Percentage of cases that will be positive. See \
+                        splitter for details")
+
 def beefy_runner(parser):
     parser.add_argument("--optimizer", type = str, choices=OPTIM,
                         help="Optimization options")
@@ -218,6 +231,13 @@ def eval_runner(parser):
     parser.add_argument("--pretrained_model", default=None, type=str,
                         help="The pretrained model to use for feature extraction. \
                          Must be used with classifier as model.")
+
+    parser.add_argument("--use_sex", type=boolean_string, default=False,
+                        help="Use sex as additional features.")
+
+    parser.add_argument("--positive_case_percent", type=float, default=0.5,
+                        help="Percentage of cases that will be positive. See \
+                        splitter for details")
 
 def optuna_runner(parser):
     parser.add_argument("--num-trials", type=int, default=20,
@@ -291,3 +311,6 @@ def prediction_runner(parser):
     parser.add_argument("--pretrained_model", default=None, type=str,
                         help="The pretrained model to use for feature extraction. \
                          Must be used with classifier as model.")
+
+    parser.add_argument("--use_sex", type=boolean_string, default=False,
+                        help="Use sex as additional features.")

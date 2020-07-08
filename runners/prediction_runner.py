@@ -9,13 +9,17 @@ from mellolib.splitter import Splitter
 import mellolib.globalConstants
 from torchvision.transforms import ToTensor
 
-def imageLoader(imageName, pretrained_model = None, debug = True):
+def imageLoader(imageName, pretrained_model = None, debug = True,
+    use_sex=False, sex=None):
 
     if pretrained_model is not None:
         # if a model was specified, get the vector of features
         try:
-            image = readVectorImage(imageName, pretrained_model)
-            return image
+            vec = readVectorImage(imageName, pretrained_model).flatten()
+            if use_sex:
+                sex = torch.FloatTensor([sex])
+                vec = torch.cat((vec, sex),0)
+            return vec.unsqueeze(0)
         except Exception as e:
             # print exception in debug mode
             if debug:
@@ -30,9 +34,11 @@ def imageLoader(imageName, pretrained_model = None, debug = True):
         image = readImage(imageName)
 
     image = ToTensor()(image).type(torch.float)
+
     image = torch.tensor(image, requires_grad=False)
-    image = image.unsqueeze(0)
-    return image
+    image = vec.unsqueeze(0)
+
+    return vec
 
 ### Setup parser
 parser = argparse.ArgumentParser()
@@ -63,7 +69,9 @@ with open(os.path.join(options.data_addr, "label.csv"), "r") as f:
 
         pred = model(imageLoader(imageName,
             pretrained_model=options.pretrained_model,
-            debug=True))
+            debug=True,
+            use_sex=options.use_sex,
+            sex=int(row[2])))
 
         prob = str(pred[0][1].detach().numpy())
 

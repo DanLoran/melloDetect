@@ -21,9 +21,9 @@ class tiny_fc(nn.Module):
         x = self.sm(x)
         return x
 
-class resnetFC(nn.Module):
+class FC512(nn.Module):
     def __init__(self):
-        super(resnetFC, self).__init__()
+        super(FC512, self).__init__()
         self.fc = nn.Sequential(OrderedDict([
             ('fc1', nn.Linear(in_features=512, out_features=100)),
             ('relu1', nn.ReLU()),
@@ -37,9 +37,9 @@ class resnetFC(nn.Module):
         x = self.fc(x)
         return x
 
-class resnetFC2048(nn.Module):
+class FC2048(nn.Module):
     def __init__(self):
-        super(resnetFC2048, self).__init__()
+        super(FC2048, self).__init__()
         self.fc = nn.Sequential(OrderedDict([
             ('fc1', nn.Linear(in_features=2048, out_features=100)),
             ('relu1', nn.ReLU()),
@@ -69,3 +69,34 @@ class FC1280(nn.Module):
         x = self.fc(x)
         return x
 
+class FC513(nn.Module):
+    def __init__(self):
+        super(FC513, self).__init__()
+        self.fc = nn.Sequential(OrderedDict([
+            ('fc1', nn.Linear(in_features=513, out_features=100)),
+            ('relu1', nn.ReLU()),
+            ('fc2', nn.Linear(in_features=100, out_features=10)),
+            ('relu2', nn.ReLU()),
+            ('fc3', nn.Linear(in_features=10, out_features=2)),
+            ('output', nn.Softmax(dim=1))
+        ]))
+
+    def forward(self,x):
+        x = self.fc(x)
+        return x
+
+class FC2049(nn.Module):
+    def __init__(self):
+        super(FC2049, self).__init__()
+        self.fc = nn.Sequential(OrderedDict([
+            ('fc1', nn.Linear(in_features=2049, out_features=100)),
+            ('relu1', nn.ReLU()),
+            ('fc2', nn.Linear(in_features=100, out_features=10)),
+            ('relu2', nn.ReLU()),
+            ('fc3', nn.Linear(in_features=10, out_features=2)),
+            ('output', nn.Softmax(dim=1))
+        ]))
+
+    def forward(self,x):
+        x = self.fc(x)
+        return x
