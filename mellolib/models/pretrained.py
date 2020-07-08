@@ -1,5 +1,6 @@
 import torch
 import torchvision
+from efficientnet_pytorch import EfficientNet
 from mellolib.globalConstants import PRETRAINED_MODEL_POOL
 
 def validatePretrained(name):
@@ -30,10 +31,14 @@ def getPretrainedModelNoFc(name):
         model = torchvision.models.resnet101(pretrained=True)
     elif name == 'alexnet':
         model = torchvision.models.alexnet(pretrained=True)
+    elif name == 'efficientnetb0':
+        model = EfficientNet.from_pretrained('efficientnet-b0')
 
     # remove the final layer
     if 'resnet' in name:
         model.fc = torch.nn.Identity()
+    elif 'efficientnet' in name:
+        model._fc = torch.nn.Identity()
     else:
         model.classifier = torch.nn.Identity()
 

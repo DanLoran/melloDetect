@@ -39,7 +39,7 @@ def read_shrink_write(path):
 
 
 if __name__ == "__main__":
-    with open("Data/Images/label.csv", "r") as f:
+    with open("label.csv", "r") as f:
         for row in csv.reader(f):
             path = "Data/Images/" + row[0]
             if (not os.path.isfile(path + "_small.jpeg")):

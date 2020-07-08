@@ -3,6 +3,8 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 from collections import OrderedDict
+from efficientnet_pytorch import EfficientNet
+
 
 def resnet18(transfer=True):
     model = torchvision.models.resnet18(pretrained=transfer)
@@ -178,5 +180,28 @@ def shufflenet(transfer=True):
         ('fc3', nn.Linear(in_features=10, out_features=2)),
         ('output', nn.Softmax(dim=1))
     ]))
+    model.fc = fc
+    return model
+
+def efficientnet_b0(transfer=True):
+    model = EfficientNet.from_pretrained('efficientnet-b0')
+    
+    # Freeze the model if transfer learning
+    if (transfer):
+        for param in model.parameters():
+            param.require_grad = False;
+
+    # Remake the final layer
+    fc = nn.Sequential(OrderedDict([
+        ('fc0', nn.Linear(in_features=1000, out_features=512)),
+        ('relu0', nn.ReLU()),
+        ('fc1', nn.Linear(in_features=512, out_features=100)),
+        ('relu1', nn.ReLU()),
+        ('fc2', nn.Linear(in_features=100, out_features=10)),
+        ('relu2', nn.ReLU()),
+        ('fc3', nn.Linear(in_features=10, out_features=2)),
+        ('output', nn.Softmax(dim=1))
+    ]))
+
     model.fc = fc
     return model

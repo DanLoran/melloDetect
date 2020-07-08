@@ -58,6 +58,12 @@ def model_selection(choice):
     elif choice == "resnet50_fc":
         model = fcs.resnetFC2048()
 
+    elif choice == "efficient_net_b0_fc":
+        model = fcs.FC1280()
+
+    elif choice == "efficient_net_b1_fc":
+        model = fcs.FC1280()
+
     else:
         print("Architecture don't exist!")
         exit(1)
