@@ -33,6 +33,20 @@ def getPretrainedModelNoFc(name):
         model = torchvision.models.alexnet(pretrained=True)
     elif name == 'efficientnetb0':
         model = EfficientNet.from_pretrained('efficientnet-b0')
+    elif name == 'efficientnetb1':
+        model = EfficientNet.from_pretrained('efficientnet-b1')
+    elif name == 'efficientnetb2':
+        model = EfficientNet.from_pretrained('efficientnet-b2')
+    elif name == 'efficientnetb3':
+        model = EfficientNet.from_pretrained('efficientnet-b3')    
+    elif name == 'efficientnetb4':
+        model = EfficientNet.from_pretrained('efficientnet-b4')
+    elif name == 'efficientnetb5':
+        model = EfficientNet.from_pretrained('efficientnet-b5')
+    elif name == 'efficientnetb6':
+        model = EfficientNet.from_pretrained('efficientnet-b6')
+    elif name == 'efficientnetb7':
+        model = EfficientNet.from_pretrained('efficientnet-b7')
 
     # remove the final layer
     if 'resnet' in name:

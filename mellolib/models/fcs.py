@@ -69,6 +69,87 @@ class FC1280(nn.Module):
         x = self.fc(x)
         return x
 
+class FC1408(nn.Module):
+    def __init__(self):
+        super(FC1408, self).__init__()
+        self.fc = nn.Sequential(OrderedDict([
+            ('fc1', nn.Linear(in_features=1408, out_features=100)),
+            ('relu1', nn.ReLU()),
+            ('fc2', nn.Linear(in_features=100, out_features=10)),
+            ('relu2', nn.ReLU()),
+            ('fc3', nn.Linear(in_features=10, out_features=2)),
+            ('output', nn.Softmax(dim=1))
+        ]))
+
+    def forward(self,x):
+        x = self.fc(x)
+        return x
+
+class FC1536(nn.Module):
+    def __init__(self):
+        super(FC1536, self).__init__()
+        self.fc = nn.Sequential(OrderedDict([
+            ('fc1', nn.Linear(in_features=1536, out_features=100)),
+            ('relu1', nn.ReLU()),
+            ('fc2', nn.Linear(in_features=100, out_features=10)),
+            ('relu2', nn.ReLU()),
+            ('fc3', nn.Linear(in_features=10, out_features=2)),
+            ('output', nn.Softmax(dim=1))
+        ]))
+
+    def forward(self,x):
+        x = self.fc(x)
+        return x
+
+class FC1792(nn.Module):
+    def __init__(self):
+        super(FC1792, self).__init__()
+        self.fc = nn.Sequential(OrderedDict([
+            ('fc1', nn.Linear(in_features=1792, out_features=100)),
+            ('relu1', nn.ReLU()),
+            ('fc2', nn.Linear(in_features=100, out_features=10)),
+            ('relu2', nn.ReLU()),
+            ('fc3', nn.Linear(in_features=10, out_features=2)),
+            ('output', nn.Softmax(dim=1))
+        ]))
+
+    def forward(self,x):
+        x = self.fc(x)
+        return x
+
+class FC2304(nn.Module):
+    def __init__(self):
+        super(FC2304, self).__init__()
+        self.fc = nn.Sequential(OrderedDict([
+            ('fc1', nn.Linear(in_features=2304, out_features=100)),
+            ('relu1', nn.ReLU()),
+            ('fc2', nn.Linear(in_features=100, out_features=10)),
+            ('relu2', nn.ReLU()),
+            ('fc3', nn.Linear(in_features=10, out_features=2)),
+            ('output', nn.Softmax(dim=1))
+        ]))
+
+    def forward(self,x):
+        x = self.fc(x)
+        return x
+
+class FC2560(nn.Module):
+    def __init__(self):
+        super(FC2560, self).__init__()
+        self.fc = nn.Sequential(OrderedDict([
+            ('fc1', nn.Linear(in_features=2560, out_features=100)),
+            ('relu1', nn.ReLU()),
+            ('fc2', nn.Linear(in_features=100, out_features=10)),
+            ('relu2', nn.ReLU()),
+            ('fc3', nn.Linear(in_features=10, out_features=2)),
+            ('output', nn.Softmax(dim=1))
+        ]))
+
+    def forward(self,x):
+        x = self.fc(x)
+        return x
+
+
 class FC513(nn.Module):
     def __init__(self):
         super(FC513, self).__init__()
