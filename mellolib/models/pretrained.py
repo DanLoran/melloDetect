@@ -2,6 +2,7 @@ import torch
 import torchvision
 from efficientnet_pytorch import EfficientNet
 from mellolib.globalConstants import PRETRAINED_MODEL_POOL
+from mellolib.models.bit import get_bit_transfer_model
 
 def validatePretrained(name):
     """
@@ -33,6 +34,8 @@ def getPretrainedModelNoFc(name):
         model = torchvision.models.alexnet(pretrained=True)
     elif name == 'efficientnetb0':
         model = EfficientNet.from_pretrained('efficientnet-b0')
+    elif name.startswith("BiT"):
+        model = get_bit_transfer_model(name)
 
     # remove the final layer
     if 'resnet' in name:

@@ -6,6 +6,7 @@ from mellolib.globalConstants import LOSS
 from mellolib.globalConstants import OPTIM
 from mellolib.globalConstants import EVAL
 import mellolib.globalConstants
+from mellolib.models import bit
 
 class LoadFromFile (argparse.Action):
     def __call__(self, parser, namespace, values, option_string = None):
@@ -63,6 +64,9 @@ def model_selection(choice):
 
     elif choice == "features_2049":
         model = fcs.FC2049()
+
+    elif choice.startswith("BiT"):
+        model = bit.get_bit_fc_layer(choice)
 
     elif choice == "efficient_net_b0_fc":
         model = fcs.FC1280()

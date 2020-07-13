@@ -13,6 +13,7 @@ ARCH = ['tiny_fc',
         'trans_shufflenet',
         'resnet18_fc',
         'resnet50_fc',
+        'BiT_fc'
         'efficient_net_b0_fc']
 
 OPTIM = ['SGD','Adam']
@@ -21,6 +22,6 @@ LOSS = ['BCE']
 
 EVAL = ['AUC','ACCURACY','F1', 'PRECISION', 'RECALL','TN','TP','FN','FP']
 
-PRETRAINED_MODEL_POOL = ['resnet18', 'resnet34', 'resnet50', 'resnet101', 'alexnet', 'efficientnetb0']
+PRETRAINED_MODEL_POOL = ['resnet18', 'resnet34', 'resnet50', 'resnet101', 'alexnet', 'BiT-M-R50x1', 'efficientnetb0']
 
 DEPLOY_ON_GPU = None
