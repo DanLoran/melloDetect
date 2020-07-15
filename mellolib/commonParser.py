@@ -70,6 +70,24 @@ def model_selection(choice):
     elif choice == "efficient_net_b1_fc":
         model = fcs.FC1280()
 
+    elif choice == "efficient_net_b2_fc":
+        model = fcs.FC1408()
+
+    elif choice == "efficient_net_b3_fc":
+        model = fcs.FC1536()
+    
+    elif choice == "efficient_net_b4_fc":
+        model = fcs.FC1792()    
+
+    elif choice == "efficient_net_b5_fc":
+        model = fcs.FC2048()
+
+    elif choice == "efficient_net_b6_fc":
+        model = fcs.FC2304()
+
+    elif choice == "efficient_net_b7_fc":
+        model = fcs.FC2560()
+
     else:
         print("Architecture don't exist!")
         exit(1)
