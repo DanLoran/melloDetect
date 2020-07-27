@@ -38,7 +38,7 @@ def getPretrainedModelNoFc(name):
     elif name == 'efficientnetb2':
         model = EfficientNet.from_pretrained('efficientnet-b2')
     elif name == 'efficientnetb3':
-        model = EfficientNet.from_pretrained('efficientnet-b3')    
+        model = EfficientNet.from_pretrained('efficientnet-b3')
     elif name == 'efficientnetb4':
         model = EfficientNet.from_pretrained('efficientnet-b4')
     elif name == 'efficientnetb5':

@@ -64,6 +64,9 @@ def model_selection(choice):
     elif choice == "features_2049":
         model = fcs.FC2049()
 
+    elif choice == "features_2561":
+        model = fcs.FC2561()
+
     elif choice == "efficient_net_b0_fc":
         model = fcs.FC1280()
 
@@ -75,9 +78,9 @@ def model_selection(choice):
 
     elif choice == "efficient_net_b3_fc":
         model = fcs.FC1536()
-    
+
     elif choice == "efficient_net_b4_fc":
-        model = fcs.FC1792()    
+        model = fcs.FC1792()
 
     elif choice == "efficient_net_b5_fc":
         model = fcs.FC2048()
