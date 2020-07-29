@@ -10,31 +10,52 @@ def ensemble(dir, mode, output):
     n_files = len(os.listdir(dir))
 
     # check that at least two files are in the target directory
-    assert n_files < 2
+    assert n_files >= 2
 
     output_data = None
 
-    for f in os.listdir(dir):
-        f_data = np.genfromtxt(f, delimiter=',', usecols=(1))
+    if mode == "max":
 
-        if mode == "max":
+        for f in os.listdir(dir):
+            filename = os.path.join(dir, f)
+            f_data = np.genfromtxt(filename, delimiter=',', usecols=(1))
 
             if output_data is None:
-                output_data = np.abs(f_data - 0.5)
+                output_data = np.reshape(f_data, (-1, 1))
                 continue
 
-            output_data = np.maximum(np.abs(f_data - 0.5), output_data)
+            output_data = np.concatenate((output_data, np.reshape(f_data, (-1,1))), axis=1)
 
-        elif mode == "mean":
+        indices = np.argmax(np.abs(output_data - 0.5), axis=1)
+
+        t_data = np.empty(indices.shape)
+        for r in range(indices.shape[0]):
+            t_data[r] = output_data[r, indices[r]]
+
+        output_data = t_data
+
+    elif mode == "mean":
+
+        for f in os.listdir(dir):
+            filename = os.path.join(dir, f)
+            f_data = np.genfromtxt(filename, delimiter=',', usecols=(1))
 
             if output_data is None:
                 output_data = f_data / n_files
 
-    np.savetxt(output, output_data)
+
+    f_strings = np.genfromtxt(filename, delimiter=',', usecols=(0), dtype=str)
+    output_table = np.empty((f_strings.shape[0], 2))
+
+    outputFile = open(output, "w")
+    outputFile.write("image_name,target\n")
+    for row in range(1, f_strings.shape[0]):
+        outputFile.write(f_strings[row] + "," + str(output_data[row]) + "\n")
+    outputFile.close()
 
 if __name__ == "__main__":
 
-    parser = argparse.Argument()
+    parser = argparse.ArgumentParser()
     parser.add_argument("--file", "-f", type=open, action=LoadFromFile)
     parser.add_argument("--dir", "-d", default=None,
                help="Directory where the predictions for all networks are located.")
